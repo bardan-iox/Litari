@@ -3,6 +3,7 @@ import 'dart:math';
 import 'package:flutter/material.dart';
 import '../theme/app_theme.dart';
 import '../widgets/litari_logo.dart';
+import 'home_screen.dart';
 
 // ════════════════════════════════════════════════════════════════
 //  BANK SOAL — tambah item di sini untuk memperluas konten
@@ -397,7 +398,7 @@ class _PilihPasanganWidgetState extends State<_PilihPasanganWidget> {
           const SizedBox(height: 8),
           Text(
             'Cocokkan kata Indonesia dengan bahasa Sunda-nya',
-            style: TextStyle(color: Colors.white.withOpacity(0.55), fontSize: 14),
+            style: TextStyle(color: Colors.white.withValues(alpha: 0.55), fontSize: 14),
           ),
           const SizedBox(height: 24),
           Expanded(
@@ -594,7 +595,7 @@ class _PilihGambarWidgetState extends State<_PilihGambarWidget> {
           const SizedBox(height: 8),
           Text(
             'Gambar mana yang sesuai dengan kata di bawah?',
-            style: TextStyle(color: Colors.white.withOpacity(0.55), fontSize: 14),
+            style: TextStyle(color: Colors.white.withValues(alpha: 0.55), fontSize: 14),
           ),
           const SizedBox(height: 20),
           // Chip kata kunci
@@ -746,7 +747,7 @@ class HasilScreen extends StatelessWidget {
             Text(
               _pesan,
               style: TextStyle(
-                color: Colors.white.withOpacity(0.7),
+                color: Colors.white.withValues(alpha: 0.7),
                 fontSize: 16,
               ),
             ),
@@ -837,11 +838,15 @@ class HasilScreen extends StatelessWidget {
                     width: double.infinity,
                     height: 52,
                     child: OutlinedButton(
-                      onPressed: () =>
-                          Navigator.of(context).popUntil((r) => r.isFirst),
+                      onPressed: () {
+                                      Navigator.of(context).pushAndRemoveUntil(
+                                        MaterialPageRoute(builder: (_) => const HomeScreen()),
+                                        (route) => false,
+                                      );
+                                    },
                       style: OutlinedButton.styleFrom(
                         side: BorderSide(
-                          color: Colors.white.withOpacity(0.3),
+                          color: Colors.white.withValues(alpha: 0.3),
                           width: 1.5,
                         ),
                         shape: RoundedRectangleBorder(
