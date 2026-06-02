@@ -110,6 +110,7 @@ class _VideoScreenState extends State<VideoScreen> {
       body: SafeArea(
         child: Column(
           children: [
+            _buildTopBar(context),
             _buildSearchBar(),
             Expanded(
               child: _filtered.isEmpty
@@ -130,6 +131,28 @@ class _VideoScreenState extends State<VideoScreen> {
             ),
           ],
         ),
+      ),
+    );
+  }
+
+  Widget _buildTopBar(BuildContext context) {
+    return Padding(
+      padding: const EdgeInsets.fromLTRB(4, 8, 16, 0),
+      child: Row(
+        children: [
+          IconButton(
+            icon: const Icon(Icons.arrow_back_ios_new, color: Colors.white),
+            onPressed: () => Navigator.of(context).pop(),
+          ),
+          const Text(
+            'Video',
+            style: TextStyle(
+              color: Colors.white,
+              fontSize: 18,
+              fontWeight: FontWeight.w800,
+            ),
+          ),
+        ],
       ),
     );
   }

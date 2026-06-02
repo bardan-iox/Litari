@@ -5,6 +5,7 @@ import 'pilih_bahasa_screen.dart';
 import 'materi_screen.dart';
 import 'profil_screen.dart';
 import 'video_screen.dart';
+import 'aksara_sunda_screen.dart';
 
 class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});
@@ -97,6 +98,12 @@ class _HomeScreenState extends State<HomeScreen> {
       Navigator.of(context).push(
         MaterialPageRoute(
           builder: (_) => const VideoScreen(),
+        ),
+      );
+    } else if (i == 3) {
+      Navigator.of(context).push(
+        MaterialPageRoute(
+          builder: (_) => const AksaraSundaScreen(),
         ),
       );
     } else if (i == 4) {
@@ -564,7 +571,7 @@ class _BottomNavBar extends StatelessWidget {
               _NavItem(icon: Icons.home_rounded,        index: 0, selected: selectedIndex == 0, onTap: onTap, color: const Color(0xFFE05252)),
               _NavItem(icon: Icons.emoji_events_rounded, index: 1, selected: selectedIndex == 1, onTap: onTap, color: const Color(0xFFD4A017)),
               _NavItem(icon: Icons.play_circle_filled,  index: 2, selected: selectedIndex == 2, onTap: onTap, color: const Color(0xFF8B2BE2)),
-              _NavItem(icon: Icons.calculate_rounded,   index: 3, selected: selectedIndex == 3, onTap: onTap, color: const Color(0xFF4CAF50)),
+              _AksaraNavItem(index: 3, selected: selectedIndex == 3, onTap: onTap),
               _NavItem(icon: Icons.person_rounded,      index: 4, selected: selectedIndex == 4, onTap: onTap, color: Colors.white70),
             ],
           ),
@@ -608,6 +615,38 @@ class _NavItem extends StatelessWidget {
           color: selected ? color : Colors.white38,
           size: 28,
         ),
+      ),
+    );
+  }
+}
+
+class _AksaraNavItem extends StatelessWidget {
+  final int index;
+  final bool selected;
+  final void Function(int) onTap;
+
+  const _AksaraNavItem({
+    required this.index,
+    required this.selected,
+    required this.onTap,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    final color = selected ? const Color(0xFF4CAF50) : Colors.white38;
+    return GestureDetector(
+      onTap: () => onTap(index),
+      behavior: HitTestBehavior.opaque,
+      child: AnimatedContainer(
+        duration: const Duration(milliseconds: 200),
+        padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 8),
+        decoration: selected
+            ? BoxDecoration(
+                color: const Color(0xFF4CAF50).withOpacity(0.12),
+                borderRadius: BorderRadius.circular(12),
+              )
+            : null,
+        child: AksaraNavIcon(color: color),
       ),
     );
   }
