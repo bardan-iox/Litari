@@ -272,7 +272,7 @@ class _MateriAccordionItem extends StatelessWidget {
                       border: Border(
                         bottom: BorderSide(
                           color: subIdx < item.subMateri.length - 1
-                              ? AppColors.divider.withOpacity(0.4)
+                              ? AppColors.divider.withValues(alpha: 0.4)
                               : Colors.transparent,
                           width: 0.5,
                         ),

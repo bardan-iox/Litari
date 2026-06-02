@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "875982109205",
+    "project_id": "litari",
+    "storage_bucket": "litari.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:875982109205:android:3a08a6a3be902dc4d72c1c",
+        "android_client_info": {
+          "package_name": "com.example.flutter_application_1"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyAcdY8nmGBTAeK9zu7v3Y6L1KselW8Qk5M"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
