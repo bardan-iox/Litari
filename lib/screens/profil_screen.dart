@@ -1,9 +1,13 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
+import 'package:litari/widgets/litari_bottom_nav_bar.dart';
 import '../services/user_service.dart';
 import '../theme/app_theme.dart';
 import 'splash_screen.dart';
+import 'home_screen.dart';
+import 'video_screen.dart';
+import 'aksara_sunda_screen.dart';
 
 class ProfilScreen extends StatelessWidget {
   const ProfilScreen({super.key});
@@ -61,6 +65,27 @@ class ProfilScreen extends StatelessWidget {
 
         return Scaffold(
           backgroundColor: AppColors.background,
+          bottomNavigationBar: LitariBottomNavBar(
+            currentIndex: 4,
+            onTap: (i) {
+              if (i == 0) {
+                Navigator.of(context).pushAndRemoveUntil(
+                  MaterialPageRoute(builder: (_) => const HomeScreen()),
+                  (route) => false,
+                );
+              } else if (i == 2) {
+                Navigator.of(context).push(
+                  MaterialPageRoute(builder: (_) => const VideoScreen()),
+                );
+              } else if (i == 3) {
+                Navigator.of(context).push(
+                  MaterialPageRoute(builder: (_) => const AksaraSundaScreen()),
+                );
+              } else if (i == 4) {
+                // Sudah di profil, tidak perlu navigasi
+              }
+            },
+          ),
           body: SafeArea(
             child: SingleChildScrollView(
               physics: const BouncingScrollPhysics(),

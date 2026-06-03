@@ -1,6 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:youtube_player_iframe/youtube_player_iframe.dart';
 import '../theme/app_theme.dart';
+import 'package:litari/widgets/litari_bottom_nav_bar.dart'; 
+import 'home_screen.dart';
+import 'profil_screen.dart';
+import 'aksara_sunda_screen.dart';
 
 // ════════════════════════════════════════════════════════════════
 //  DATA VIDEO
@@ -107,6 +111,28 @@ class _VideoScreenState extends State<VideoScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: AppColors.background,
+      bottomNavigationBar: LitariBottomNavBar(
+        currentIndex: 2,
+        onTap: (i) {
+          if (i == 0) {
+            Navigator.of(context).pushReplacement(
+              MaterialPageRoute(builder: (_) => const HomeScreen()),
+            );
+          } else if (i == 1) {
+            // Materi belum ada, tidak perlu navigasi
+          } else if (i == 2) {
+            // Sudah di video, tidak perlu navigasi
+          } else if (i == 3) {
+            Navigator.of(context).pushReplacement(
+              MaterialPageRoute(builder: (_) => const AksaraSundaScreen()),
+            );
+          } else if (i == 4) {
+            Navigator.of(context).pushReplacement(
+              MaterialPageRoute(builder: (_) => const ProfilScreen()),
+            );
+          }
+        },
+      ),
       body: SafeArea(
         child: Column(
           children: [

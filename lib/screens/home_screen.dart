@@ -1,12 +1,12 @@
 import 'package:flutter/material.dart';
 import '../theme/app_theme.dart';
 import '../widgets/litari_logo.dart';
+import '../widgets/litari_bottom_nav_bar.dart';
 import 'pilih_bahasa_screen.dart';
 import 'materi_screen.dart';
 import 'profil_screen.dart';
 import 'video_screen.dart';
 import 'aksara_sunda_screen.dart';
-
 
 class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});
@@ -23,7 +23,7 @@ class _HomeScreenState extends State<HomeScreen> {
       key: 'sunda',
       nama: 'Bahasa Sunda',
       deskripsi: 'Pelajari bahasa Sunda dari dasar',
-      emoji: '🌋',
+      imagePath: 'assets/images/sunda.png',
       warna: Color(0xFF9B5B2E),
       warnaGradient: Color(0xFFCA8A3A),
       progress: 0.35,
@@ -32,7 +32,7 @@ class _HomeScreenState extends State<HomeScreen> {
       key: 'jawa',
       nama: 'Bahasa Jawa',
       deskripsi: 'Kuasai bahasa Jawa dengan mudah',
-      emoji: '🏯',
+      imagePath: 'assets/images/jawa.jpg',
       warna: Color(0xFF3A8A2E),
       warnaGradient: Color(0xFFCA9B20),
       progress: 0.0,
@@ -41,7 +41,7 @@ class _HomeScreenState extends State<HomeScreen> {
       key: 'melayu',
       nama: 'Bahasa Melayu',
       deskripsi: 'Jelajahi kekayaan bahasa Melayu',
-      emoji: '⛵',
+      imagePath: 'assets/images/melayu.jpg',
       warna: Color(0xFF1A6B8A),
       warnaGradient: Color(0xFF2A8AAA),
       progress: 0.0,
@@ -50,7 +50,7 @@ class _HomeScreenState extends State<HomeScreen> {
       key: 'bali',
       nama: 'Bahasa Bali',
       deskripsi: 'Temukan keindahan bahasa Bali',
-      emoji: '🪷',
+      imagePath: 'assets/images/bali.jpeg',
       warna: Color(0xFF8A2A2A),
       warnaGradient: Color(0xFFAA4A20),
       progress: 0.0,
@@ -92,34 +92,30 @@ class _HomeScreenState extends State<HomeScreen> {
           ],
         ),
       ),
-      bottomNavigationBar: _BottomNavBar(
-  selectedIndex: _selectedNavIndex,
-  onTap: (i) {
-    if (i == 2) {
-      Navigator.of(context).push(
-        MaterialPageRoute(
-          builder: (_) => const VideoScreen(),
-        ),
-      );
-    } else if (i == 3) {
-      Navigator.of(context).push(
-        MaterialPageRoute(
-          builder: (_) => const AksaraSundaScreen(),
-        ),
-      );
-    } else if (i == 4) {
-      Navigator.of(context).push(
-        MaterialPageRoute(
-          builder: (_) => const ProfilScreen(),
-        ),
-      );
-    } else {
-      setState(() => _selectedNavIndex = i);
-    }
-  },
-),
+      bottomNavigationBar: LitariBottomNavBar(
+        currentIndex: _selectedNavIndex,
+        onTap: (i) {
+          if (i == 2) {
+            Navigator.of(context).push(
+              MaterialPageRoute(builder: (_) => const VideoScreen()),
+            );
+          } else if (i == 3) {
+            Navigator.of(context).push(
+              MaterialPageRoute(builder: (_) => const AksaraSundaScreen()),
+            );
+          } else if (i == 4) {
+            Navigator.of(context).push(
+              MaterialPageRoute(builder: (_) => const ProfilScreen()),
+            );
+          } else {
+            setState(() => _selectedNavIndex = i);
+          }
+        },
+      ),
     );
   }
+
+  // ── Header: LitariLogo instead of CustomPainter ──────────────
 
   Widget _buildHeader() {
     return Container(
@@ -127,15 +123,17 @@ class _HomeScreenState extends State<HomeScreen> {
       decoration: BoxDecoration(
         color: AppColors.background,
         border: Border(
-          bottom: BorderSide(color: AppColors.divider.withOpacity(0.4), width: 0.5),
+          bottom: BorderSide(
+              color: AppColors.divider.withOpacity(0.4), width: 0.5),
         ),
       ),
       child: Row(
         children: [
-          SizedBox(
+          // ← replaced CustomPaint(_MiniMascotPainter) with LitariLogo
+          const SizedBox(
             width: 40,
             height: 40,
-            child: CustomPaint(painter: _MiniMascotPainter()),
+            child: LitariLogo(showName: false, size : 40),
           ),
           const SizedBox(width: 10),
           const Text(
@@ -149,14 +147,17 @@ class _HomeScreenState extends State<HomeScreen> {
           ),
           const Spacer(),
           Container(
-            padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+            padding:
+                const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
             decoration: BoxDecoration(
               color: const Color(0xFF2C3347),
               borderRadius: BorderRadius.circular(20),
-              border: Border.all(color: const Color(0xFFFFD700).withOpacity(0.4), width: 1),
+              border: Border.all(
+                  color: const Color(0xFFFFD700).withOpacity(0.4),
+                  width: 1),
             ),
-            child: Row(
-              children: const [
+            child: const Row(
+              children: [
                 Text('⚡', style: TextStyle(fontSize: 14)),
                 SizedBox(width: 4),
                 Text(
@@ -178,7 +179,8 @@ class _HomeScreenState extends State<HomeScreen> {
               color: AppColors.surfaceVariant,
               borderRadius: BorderRadius.circular(10),
             ),
-            child: const Icon(Icons.notifications_outlined, color: Colors.white70, size: 20),
+            child: const Icon(Icons.notifications_outlined,
+                color: Colors.white70, size: 20),
           ),
         ],
       ),
@@ -195,7 +197,8 @@ class _HomeScreenState extends State<HomeScreen> {
           end: Alignment.bottomRight,
         ),
         borderRadius: BorderRadius.circular(16),
-        border: Border.all(color: AppColors.primary.withOpacity(0.5), width: 1),
+        border:
+            Border.all(color: AppColors.primary.withOpacity(0.5), width: 1),
       ),
       child: Row(
         children: [
@@ -235,7 +238,8 @@ class _HomeScreenState extends State<HomeScreen> {
             ),
           ),
           Container(
-            padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 8),
+            padding:
+                const EdgeInsets.symmetric(horizontal: 14, vertical: 8),
             decoration: BoxDecoration(
               color: AppColors.primary,
               borderRadius: BorderRadius.circular(10),
@@ -269,7 +273,8 @@ class _HomeScreenState extends State<HomeScreen> {
     return GestureDetector(
       onTap: () {
         Navigator.of(context).push(
-          MaterialPageRoute(builder: (_) => const MateriScreen(bahasaKey: 'sunda')),
+          MaterialPageRoute(
+              builder: (_) => const MateriScreen(bahasaKey: 'sunda')),
         );
       },
       child: Container(
@@ -287,7 +292,26 @@ class _HomeScreenState extends State<HomeScreen> {
           children: [
             Row(
               children: [
-                const Text('🌋', style: TextStyle(fontSize: 32)),
+                // Image version of the "continue learning" banner
+                ClipRRect(
+                  borderRadius: BorderRadius.circular(10),
+                  child: Image.asset(
+                    'assets/images/sunda.png',
+                    width: 48,
+                    height: 48,
+                    fit: BoxFit.cover,
+                    errorBuilder: (_, error, ___) {
+                      debugPrint('Image load error: $error');
+                      return Container(
+                        color: card.warna,
+                        child: Center(
+                          child: Text(card.nama[0],
+                            style: const TextStyle(color: Colors.white, fontSize: 32)),
+                        ),
+                      );
+                    },
+                  ),
+                ),
                 const SizedBox(width: 12),
                 Expanded(
                   child: Column(
@@ -296,6 +320,7 @@ class _HomeScreenState extends State<HomeScreen> {
                       const Text(
                         'Bahasa Sunda',
                         style: TextStyle(
+                          //fontFamily: 'aksara_sunda',
                           color: Colors.white,
                           fontSize: 18,
                           fontWeight: FontWeight.w900,
@@ -318,7 +343,8 @@ class _HomeScreenState extends State<HomeScreen> {
                     color: Colors.white.withOpacity(0.2),
                     borderRadius: BorderRadius.circular(10),
                   ),
-                  child: const Icon(Icons.play_arrow_rounded, color: Colors.white, size: 24),
+                  child: const Icon(Icons.play_arrow_rounded,
+                      color: Colors.white, size: 24),
                 ),
               ],
             ),
@@ -329,7 +355,8 @@ class _HomeScreenState extends State<HomeScreen> {
                 value: 0.35,
                 minHeight: 8,
                 backgroundColor: Colors.white.withOpacity(0.25),
-                valueColor: const AlwaysStoppedAnimation<Color>(Colors.white),
+                valueColor:
+                    const AlwaysStoppedAnimation<Color>(Colors.white),
               ),
             ),
           ],
@@ -346,14 +373,17 @@ class _HomeScreenState extends State<HomeScreen> {
       mainAxisSpacing: 12,
       crossAxisSpacing: 12,
       childAspectRatio: 1.1,
-      children: _bahasaList.map((b) => _BahasaCardWidget(
-        card: b,
-        onTap: () {
-          Navigator.of(context).push(
-            MaterialPageRoute(builder: (_) => MateriScreen(bahasaKey: b.key)),
-          );
-        },
-      )).toList(),
+      children: _bahasaList
+          .map((b) => _BahasaCardWidget(
+                card: b,
+                onTap: () {
+                  Navigator.of(context).push(
+                    MaterialPageRoute(
+                        builder: (_) => MateriScreen(bahasaKey: b.key)),
+                  );
+                },
+              ))
+          .toList(),
     );
   }
 
@@ -382,7 +412,8 @@ class _HomeScreenState extends State<HomeScreen> {
               ),
               const Spacer(),
               Container(
-                padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                padding:
+                    const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
                 decoration: BoxDecoration(
                   color: const Color(0xFF2A8AAA).withOpacity(0.2),
                   borderRadius: BorderRadius.circular(8),
@@ -408,26 +439,32 @@ class _HomeScreenState extends State<HomeScreen> {
           ),
           const SizedBox(height: 12),
           Row(
-            children: List.generate(5, (i) => Padding(
-              padding: const EdgeInsets.only(right: 8),
-              child: Container(
-                width: 36,
-                height: 36,
-                decoration: BoxDecoration(
-                  color: i < 2 ? AppColors.primary : AppColors.surface,
-                  borderRadius: BorderRadius.circular(10),
-                  border: Border.all(
-                    color: i < 2 ? AppColors.primary : AppColors.inputBorder,
-                    width: 1.5,
+            children: List.generate(
+              5,
+              (i) => Padding(
+                padding: const EdgeInsets.only(right: 8),
+                child: Container(
+                  width: 36,
+                  height: 36,
+                  decoration: BoxDecoration(
+                    color:
+                        i < 2 ? AppColors.primary : AppColors.surface,
+                    borderRadius: BorderRadius.circular(10),
+                    border: Border.all(
+                      color: i < 2
+                          ? AppColors.primary
+                          : AppColors.inputBorder,
+                      width: 1.5,
+                    ),
+                  ),
+                  child: Icon(
+                    i < 2 ? Icons.check : Icons.bolt_outlined,
+                    color: i < 2 ? Colors.white : Colors.white30,
+                    size: 18,
                   ),
                 ),
-                child: Icon(
-                  i < 2 ? Icons.check : Icons.bolt_outlined,
-                  color: i < 2 ? Colors.white : Colors.white30,
-                  size: 18,
-                ),
               ),
-            )),
+            ),
           ),
         ],
       ),
@@ -441,7 +478,7 @@ class _BahasaCard {
   final String key;
   final String nama;
   final String deskripsi;
-  final String emoji;
+  final String imagePath; // ← was emoji
   final Color warna;
   final Color warnaGradient;
   final double progress;
@@ -450,12 +487,14 @@ class _BahasaCard {
     required this.key,
     required this.nama,
     required this.deskripsi,
-    required this.emoji,
+    required this.imagePath,
     required this.warna,
     required this.warnaGradient,
     required this.progress,
   });
 }
+
+// ─── Bahasa card widget ────────────────────────────────────────
 
 class _BahasaCardWidget extends StatelessWidget {
   final _BahasaCard card;
@@ -476,178 +515,79 @@ class _BahasaCardWidget extends StatelessWidget {
           ),
           borderRadius: BorderRadius.circular(16),
         ),
-        padding: const EdgeInsets.all(14),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Text(card.emoji, style: const TextStyle(fontSize: 30)),
-            const Spacer(),
-            Text(
-              card.nama,
-              style: const TextStyle(
-                color: Colors.white,
-                fontSize: 14,
-                fontWeight: FontWeight.w800,
-              ),
-            ),
-            const SizedBox(height: 6),
-            if (card.progress > 0) ...[
-              ClipRRect(
-                borderRadius: BorderRadius.circular(4),
-                child: LinearProgressIndicator(
-                  value: card.progress,
-                  minHeight: 5,
-                  backgroundColor: Colors.white.withOpacity(0.25),
-                  valueColor: const AlwaysStoppedAnimation<Color>(Colors.white),
-                ),
-              ),
-            ] else ...[
-              Text(
-                'Mulai belajar →',
-                style: TextStyle(
-                  color: Colors.white.withOpacity(0.75),
-                  fontSize: 11,
-                  fontWeight: FontWeight.w600,
-                ),
-              ),
-            ],
-          ],
-        ),
-      ),
-    );
-  }
-}
-
-// ─── Mini mascot untuk header ──────────────────────────────────
-
-class _MiniMascotPainter extends CustomPainter {
-  @override
-  void paint(Canvas canvas, Size size) {
-    final cx = size.width / 2;
-    final cy = size.height / 2;
-    final p = Paint()..color = const Color(0xFFE07B3A);
-    canvas.drawCircle(Offset(cx, cy - 4), 14, p);
-    canvas.drawOval(Rect.fromCenter(center: Offset(cx, cy + 8), width: 24, height: 18), p);
-    final belly = Paint()..color = const Color(0xFFF5DEB3);
-    canvas.drawOval(Rect.fromCenter(center: Offset(cx, cy - 2), width: 16, height: 13), belly);
-    final eye = Paint()..color = const Color(0xFF3D1A00);
-    canvas.drawCircle(Offset(cx - 4, cy - 6), 2, eye);
-    canvas.drawCircle(Offset(cx + 4, cy - 6), 2, eye);
-    final cape = Paint()..color = const Color(0xFFC0392B);
-    final capePath = Path()
-      ..moveTo(cx - 12, cy + 2)
-      ..quadraticBezierTo(cx, cy + 22, cx + 12, cy + 2)
-      ..quadraticBezierTo(cx + 8, cy + 18, cx, cy + 24)
-      ..quadraticBezierTo(cx - 8, cy + 18, cx - 12, cy + 2)
-      ..close();
-    canvas.drawPath(capePath, cape);
-  }
-
-  @override
-  bool shouldRepaint(covariant CustomPainter old) => false;
-}
-
-// ─── Bottom Navigation Bar ─────────────────────────────────────
-
-class _BottomNavBar extends StatelessWidget {
-  final int selectedIndex;
-  final void Function(int) onTap;
-
-  const _BottomNavBar({required this.selectedIndex, required this.onTap});
-
-  @override
-  Widget build(BuildContext context) {
-    return Container(
-      decoration: BoxDecoration(
-        color: AppColors.background,
-        border: Border(top: BorderSide(color: AppColors.divider, width: 0.5)),
-      ),
-      child: SafeArea(
-        top: false,
-        child: SizedBox(
-          height: 64,
-          child: Row(
-            mainAxisAlignment: MainAxisAlignment.spaceAround,
+        child: ClipRRect(
+          borderRadius: BorderRadius.circular(16),
+          child: Stack(
+            fit: StackFit.expand,
             children: [
-              _NavItem(icon: Icons.home_rounded,        index: 0, selected: selectedIndex == 0, onTap: onTap, color: const Color(0xFFE05252)),
-              _NavItem(icon: Icons.emoji_events_rounded, index: 1, selected: selectedIndex == 1, onTap: onTap, color: const Color(0xFFD4A017)),
-              _NavItem(icon: Icons.play_circle_filled,  index: 2, selected: selectedIndex == 2, onTap: onTap, color: const Color(0xFF8B2BE2)),
-              _AksaraNavItem(index: 3, selected: selectedIndex == 3, onTap: onTap),
-              _NavItem(icon: Icons.person_rounded,      index: 4, selected: selectedIndex == 4, onTap: onTap, color: Colors.white70),
+              // Background image, faded into the gradient
+              Positioned.fill(
+                child: Image.asset(
+                  card.imagePath,
+                  fit: BoxFit.cover,
+                  alignment: Alignment.topCenter,
+                  errorBuilder: (_, __, ___) => const SizedBox.shrink(),
+                ),
+              ),
+              // Dark overlay so text stays readable
+              Positioned.fill(
+                child: Container(
+                  decoration: BoxDecoration(
+                    gradient: LinearGradient(
+                      colors: [
+                        Colors.transparent,
+                        card.warna.withOpacity(0.85),
+                      ],
+                      begin: Alignment.topCenter,
+                      end: Alignment.bottomCenter,
+                    ),
+                  ),
+                ),
+              ),
+              // Text content pinned to the bottom
+              Positioned(
+                left: 12,
+                right: 12,
+                bottom: 12,
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    Text(
+                      card.nama,
+                      style: const TextStyle(
+                        color: Colors.white,
+                        fontSize: 13,
+                        fontWeight: FontWeight.w800,
+                      ),
+                    ),
+                    const SizedBox(height: 6),
+                    if (card.progress > 0)
+                      ClipRRect(
+                        borderRadius: BorderRadius.circular(4),
+                        child: LinearProgressIndicator(
+                          value: card.progress,
+                          minHeight: 5,
+                          backgroundColor: Colors.white.withOpacity(0.25),
+                          valueColor: const AlwaysStoppedAnimation<Color>(
+                              Colors.white),
+                        ),
+                      )
+                    else
+                      Text(
+                        'Mulai belajar →',
+                        style: TextStyle(
+                          color: Colors.white.withOpacity(0.75),
+                          fontSize: 11,
+                          fontWeight: FontWeight.w600,
+                        ),
+                      ),
+                  ],
+                ),
+              ),
             ],
           ),
         ),
-      ),
-    );
-  }
-}
-
-class _NavItem extends StatelessWidget {
-  final IconData icon;
-  final int index;
-  final bool selected;
-  final void Function(int) onTap;
-  final Color color;
-
-  const _NavItem({
-    required this.icon,
-    required this.index,
-    required this.selected,
-    required this.onTap,
-    required this.color,
-  });
-
-  @override
-  Widget build(BuildContext context) {
-    return GestureDetector(
-      onTap: () => onTap(index),
-      behavior: HitTestBehavior.opaque,
-      child: AnimatedContainer(
-        duration: const Duration(milliseconds: 200),
-        padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 8),
-        decoration: selected
-            ? BoxDecoration(
-                color: color.withOpacity(0.12),
-                borderRadius: BorderRadius.circular(12),
-              )
-            : null,
-        child: Icon(
-          icon,
-          color: selected ? color : Colors.white38,
-          size: 28,
-        ),
-      ),
-    );
-  }
-}
-
-class _AksaraNavItem extends StatelessWidget {
-  final int index;
-  final bool selected;
-  final void Function(int) onTap;
-
-  const _AksaraNavItem({
-    required this.index,
-    required this.selected,
-    required this.onTap,
-  });
-
-  @override
-  Widget build(BuildContext context) {
-    final color = selected ? const Color(0xFF4CAF50) : Colors.white38;
-    return GestureDetector(
-      onTap: () => onTap(index),
-      behavior: HitTestBehavior.opaque,
-      child: AnimatedContainer(
-        duration: const Duration(milliseconds: 200),
-        padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 8),
-        decoration: selected
-            ? BoxDecoration(
-                color: const Color(0xFF4CAF50).withOpacity(0.12),
-                borderRadius: BorderRadius.circular(12),
-              )
-            : null,
-        child: AksaraNavIcon(color: color),
       ),
     );
   }
