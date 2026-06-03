@@ -3,6 +3,7 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import '../services/user_service.dart';
 import '../theme/app_theme.dart';
+import 'cari_teman_screen.dart';
 
 class ProfilScreen extends StatelessWidget {
   const ProfilScreen({super.key});
@@ -68,7 +69,7 @@ class ProfilScreen extends StatelessWidget {
                 children: [
                   _buildProfileHeader(context, data),
                   const SizedBox(height: 20),
-                  _buildDaftarTeman(data),
+                  _buildDaftarTeman(context,data),
                   const SizedBox(height: 20),
                   _buildRingkasan(data),
                   const SizedBox(height: 20),
@@ -88,14 +89,15 @@ class ProfilScreen extends StatelessWidget {
   }
 
   // ─── Profile Header ────────────────────────────────
-
-  Widget _buildProfileHeader(
+Widget _buildProfileHeader(
       BuildContext context, Map<String, dynamic> data) {
     final username = data['username'] as String? ?? '—';
     final photoUrl = data['photoUrl'] as String? ?? '';
     final xp = data['xp'] as int? ?? 0;
     final streak = data['streak'] as int? ?? 0;
-    final friends = (data['friends'] as List?)?.length ?? 0;
+    
+    final followingCount = (data['friends'] as List?)?.length ?? 0;
+    final String currentUid = FirebaseAuth.instance.currentUser?.uid ?? '';
 
     return Container(
       width: double.infinity,
@@ -164,8 +166,31 @@ class ProfilScreen extends StatelessWidget {
           Row(
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
-              _StatBox(label: 'Teman', value: '$friends'),
-              const SizedBox(width: 16),
+              // kotak mengikuti
+              _StatBox(
+                label: 'Mengikuti', 
+                value: '$followingCount',
+              ),
+              const SizedBox(width: 12), 
+              
+              // kotak pengikut
+              StreamBuilder<int>(
+                stream: FirebaseFirestore.instance
+                    .collection('users')
+                    .where('friends', arrayContains: currentUid)
+                    .snapshots()
+                    .map((snapshot) => snapshot.docs.length),
+                builder: (context, snapshot) {
+                  final int followersCount = snapshot.data ?? 0;
+                  return _StatBox(
+                    label: 'Pengikut', 
+                    value: '$followersCount',
+                  );
+                },
+              ),
+              const SizedBox(width: 12), 
+              
+              // kotak streak
               _StatBox(
                 label: 'Streak',
                 value: '🔥 $streak',
@@ -179,69 +204,144 @@ class ProfilScreen extends StatelessWidget {
 
   // ─── Daftar Teman ──────────────────────────────────
 
-  Widget _buildDaftarTeman(Map<String, dynamic> data) {
-    final friendIds = List<String>.from(data['friends'] ?? []);
+ Widget _buildDaftarTeman(BuildContext context, Map<String, dynamic> data) {
+  final friendIds = List<String>.from(data['friends'] ?? []);
 
-    return Padding(
-      padding: const EdgeInsets.symmetric(horizontal: 16),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+  // Tombol +
+  final tombolTambahOranye = GestureDetector(
+    onTap: () {
+      Navigator.push(
+        context,
+        MaterialPageRoute(
+          builder: (context) => const CariTemanScreen(), 
+        ),
+      );
+    },
+    child: Column(
+      mainAxisSize: MainAxisSize.min,
+      mainAxisAlignment: MainAxisAlignment.center,
+      children: [
+        Container(
+          width: 52, 
+          height: 52,
+          decoration: const BoxDecoration(
+            color: Color(0xFFE07A5F), 
+            shape: BoxShape.circle,
+          ),
+          child: const Icon(
+            Icons.add,
+            color: Colors.white, 
+            size: 28,
+          ),
+        ),
+        const SizedBox(height: 6),
+        const Text(
+          'Tambah', 
+          style: TextStyle(
+            color: Colors.white54, 
+            fontSize: 11,
+            fontWeight: FontWeight.w500,
+          ),
+        ),
+      ],
+    ),
+  );
+
+  return Padding(
+    padding: const EdgeInsets.symmetric(horizontal: 16),
+    child: Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        // HEADLINE
+        Row(
+          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          children: [
+            const Text(
+              'Daftar Teman',
+              style: TextStyle(
+                color: Colors.white,
+                fontSize: 18,
+                fontWeight: FontWeight.w800,
+              ),
+            ),
+            Text(
+              'Lihat Daftar',
+              style: TextStyle(
+                color: const Color(0xFFE07A5F), 
+                fontSize: 14,
+                fontWeight: FontWeight.w600,
+              ),
+            ),
+          ],
+        ),
+        const SizedBox(height: 12),
+
+        // KOTAK UTAMA DAFTAR TEMAN 
+        Container(
+          width: double.infinity,
+          padding: const EdgeInsets.symmetric(vertical: 14, horizontal: 14),
+          decoration: BoxDecoration(
+            color: AppColors.surface, 
+            borderRadius: BorderRadius.circular(18),
+            border: Border.all(color: AppColors.inputBorder, width: 1.5), 
+          ),
+          child: Row(
             children: [
-              const Text(
-                'Daftar Teman',
-                style: TextStyle(
-                  color: Colors.white,
-                  fontSize: 18,
-                  fontWeight: FontWeight.w800,
-                ),
+              // KIRI : Daftar Teman
+              Expanded(
+                child: friendIds.isEmpty
+                    ? const SizedBox(
+                        height: 95,
+                        child: Align(
+                          alignment: Alignment.centerLeft,
+                          child: Text(
+                            'Belum ada teman.\nYuk, cari teman baru dan terhubung bersama!',
+                            style: TextStyle(color: Colors.white54, fontSize: 13, height: 1.3),
+                          ),
+                        ),
+                      )
+                    : SizedBox(
+                        height: 95,
+                        child: ListView.separated(
+                          scrollDirection: Axis.horizontal,
+                          itemCount: friendIds.length, 
+                          separatorBuilder: (_, __) => const SizedBox(width: 16),
+                          itemBuilder: (ctx, i) {
+                            return _TemanCardRemote(uid: friendIds[i]);
+                          },
+                        ),
+                      ),
               ),
-              Text(
-                'Lihat Daftar',
-                style: TextStyle(
-                  color: AppColors.primary,
-                  fontSize: 14,
-                  fontWeight: FontWeight.w600,
+
+              // KANAN: Pembatas & Tombol Tambah
+              if (friendIds.isNotEmpty) ...[
+                Container(
+                  height: 50,
+                  width: 1,
+                  color: Colors.white10,
+                  margin: const EdgeInsets.symmetric(horizontal: 14),
                 ),
-              ),
+              ] else ...[
+                const SizedBox(width: 14),
+              ],
+              
+              tombolTambahOranye,
             ],
           ),
-          const SizedBox(height: 12),
-          friendIds.isEmpty
-              ? Container(
-                  width: double.infinity,
-                  padding: const EdgeInsets.all(20),
-                  decoration: BoxDecoration(
-                    color: AppColors.surface,
-                    borderRadius: BorderRadius.circular(14),
-                    border: Border.all(color: AppColors.inputBorder),
-                  ),
-                  child: const Text(
-                    'Belum ada teman. Cari dan tambah teman!',
-                    textAlign: TextAlign.center,
-                    style:
-                        TextStyle(color: Colors.white54, fontSize: 13),
-                  ),
-                )
-              : SizedBox(
-                  height: 140,
-                  child: ListView.separated(
-                    scrollDirection: Axis.horizontal,
-                    itemCount: friendIds.length > 5
-                        ? 5
-                        : friendIds.length,
-                    separatorBuilder: (_, __) =>
-                        const SizedBox(width: 12),
-                    itemBuilder: (ctx, i) =>
-                        _TemanCardRemote(uid: friendIds[i]),
-                  ),
-                ),
-        ],
-      ),
-    );
-  }
+        ),
+      ],
+    ),
+  );
+}
+
+// Fungsi Backend: Menambahkan UID teman ke dalam array 'friends' di Firestore
+void _tambahTemanFirebase(String targetUid) async {
+  String myUid = FirebaseAuth.instance.currentUser!.uid;
+
+  await FirebaseFirestore.instance.collection('users').doc(myUid).update({
+    'friends': FieldValue.arrayUnion([targetUid])
+  });
+}
 
   // ─── Ringkasan ─────────────────────────────────────
 
@@ -250,7 +350,6 @@ class ProfilScreen extends StatelessWidget {
         Map<String, dynamic>.from(data['materiSelesai'] ?? {});
     final totalSelesai = data['totalMateriSelesai'] as int? ?? 0;
 
-    // Ambil 4 materi terakhir yang selesai
     final selesaiKeys = materiSelesai.keys
         .where((k) => materiSelesai[k] == true)
         .toList();
@@ -293,7 +392,7 @@ class ProfilScreen extends StatelessWidget {
                   childAspectRatio: 3,
                   children: selesaiKeys
                       .take(4)
-                      .map((k) => _RingkasanItem(label: k.replaceAll('.', ' ')))
+                      .map((k) => _RingkasanItem(label: k.replaceAll('.', ' '))).toList()
                       .toList(),
                 ),
           const SizedBox(height: 10),
@@ -537,52 +636,51 @@ class _TemanCardRemote extends StatelessWidget {
         final name = data['username'] as String? ?? '…';
         final photo = data['photoUrl'] as String? ?? '';
 
-        return Container(
-          width: 120,
-          padding: const EdgeInsets.all(14),
-          decoration: BoxDecoration(
-            color: AppColors.surface,
-            borderRadius: BorderRadius.circular(14),
-            border: Border.all(color: AppColors.inputBorder),
+       return Column(
+        mainAxisSize: MainAxisSize.min,
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: [
+          Container(
+            width: 56, 
+            height: 56,
+            decoration: BoxDecoration(
+              shape: BoxShape.circle,
+              color: AppColors.surfaceVariant,
+            ),
+            child: photo.isNotEmpty
+                ? ClipOval(
+                    child: Image.network(
+                      photo,
+                      fit: BoxFit.cover,
+                      errorBuilder: (_, __, ___) => const Icon(
+                        Icons.person,
+                        color: Colors.white54,
+                        size: 32,
+                      ),
+                    ),
+                  )
+                : const Icon(
+                    Icons.person,
+                    color: Colors.white54, 
+                    size: 32,
+                  ),
           ),
-          child: Column(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: [
-              Container(
-                width: 44,
-                height: 44,
-                decoration: BoxDecoration(
-                  shape: BoxShape.circle,
-                  color: AppColors.surfaceVariant,
-                ),
-                child: photo.isNotEmpty
-                    ? ClipOval(
-                        child: Image.network(photo,
-                            fit: BoxFit.cover,
-                            errorBuilder: (_, __, ___) => const Icon(
-                                Icons.person,
-                                color: Colors.white54,
-                                size: 28)))
-                    : const Icon(Icons.person,
-                        color: Colors.white54, size: 28),
-              ),
-              const SizedBox(height: 8),
-              Text(
-                name,
-                maxLines: 1,
-                overflow: TextOverflow.ellipsis,
-                style: const TextStyle(
-                  color: Colors.white,
-                  fontWeight: FontWeight.w700,
-                  fontSize: 13,
-                ),
-              ),
-            ],
+          const SizedBox(height: 6), 
+          Text(
+            name,
+            maxLines: 1,
+            overflow: TextOverflow.ellipsis,
+            style: const TextStyle(
+              color: Colors.white,
+              fontWeight: FontWeight.w600,
+              fontSize: 12,
+            ),
           ),
-        );
-      },
-    );
-  }
+        ],
+      );
+    },
+  );
+}
 }
 
 class _RingkasanItem extends StatelessWidget {
