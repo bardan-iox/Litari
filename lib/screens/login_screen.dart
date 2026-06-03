@@ -311,52 +311,23 @@ class _SocialLoginRow extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Row(
-      children: [
-        Expanded(
-          child: _SocialButton(
-            onPressed: () {},
-            child: Row(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                SvgPicture.asset('assets/Facebook_logo.svg',
-                    width: 28, height: 28),
-                const SizedBox(width: 8),
-                const Text(
-                  'facebook',
-                  style: TextStyle(
-                    color: AppColors.facebookBlue,
-                    fontSize: 18,
-                    fontWeight: FontWeight.bold,
-                  ),
-                ),
-              ],
+    return _SocialButton(
+      onPressed: onGooglePressed,
+      child: Row(
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: [
+          SvgPicture.asset('assets/Google_logo.svg', width: 28, height: 28),
+          const SizedBox(width: 10),
+          const Text(
+            'Masuk dengan Google',
+            style: TextStyle(
+              color: AppColors.textPrimary,
+              fontSize: 16,
+              fontWeight: FontWeight.w600,
             ),
           ),
-        ),
-        const SizedBox(width: 14),
-        Expanded(
-          child: _SocialButton(
-            onPressed: onGooglePressed,
-            child: Row(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                SvgPicture.asset('assets/Google_logo.svg',
-                    width: 28, height: 28),
-                const SizedBox(width: 8),
-                const Text(
-                  'Google',
-                  style: TextStyle(
-                    color: AppColors.textPrimary,
-                    fontSize: 18,
-                    fontWeight: FontWeight.w500,
-                  ),
-                ),
-              ],
-            ),
-          ),
-        ),
-      ],
+        ],
+      ),
     );
   }
 }
@@ -370,6 +341,7 @@ class _SocialButton extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return SizedBox(
+      width: double.infinity,
       height: 56,
       child: ElevatedButton(
         onPressed: onPressed,
