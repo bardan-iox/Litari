@@ -1,12 +1,10 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import '../theme/app_theme.dart';
-import '../widgets/litari_logo.dart';
-import '../widgets/litari_bottom_nav_bar.dart';
-import 'pilih_bahasa_screen.dart';
+import '../services/user_service.dart';
 import 'materi_screen.dart';
 import 'profil_screen.dart';
 import 'video_screen.dart';
-import 'aksara_sunda_screen.dart';
 
 class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});
@@ -23,7 +21,7 @@ class _HomeScreenState extends State<HomeScreen> {
       key: 'sunda',
       nama: 'Bahasa Sunda',
       deskripsi: 'Pelajari bahasa Sunda dari dasar',
-      imagePath: 'assets/images/sunda.png',
+      emoji: '🌋',
       warna: Color(0xFF9B5B2E),
       warnaGradient: Color(0xFFCA8A3A),
       progress: 0.35,
@@ -32,7 +30,7 @@ class _HomeScreenState extends State<HomeScreen> {
       key: 'jawa',
       nama: 'Bahasa Jawa',
       deskripsi: 'Kuasai bahasa Jawa dengan mudah',
-      imagePath: 'assets/images/jawa.jpg',
+      emoji: '🏯',
       warna: Color(0xFF3A8A2E),
       warnaGradient: Color(0xFFCA9B20),
       progress: 0.0,
@@ -41,7 +39,7 @@ class _HomeScreenState extends State<HomeScreen> {
       key: 'melayu',
       nama: 'Bahasa Melayu',
       deskripsi: 'Jelajahi kekayaan bahasa Melayu',
-      imagePath: 'assets/images/melayu.jpg',
+      emoji: '⛵',
       warna: Color(0xFF1A6B8A),
       warnaGradient: Color(0xFF2A8AAA),
       progress: 0.0,
@@ -50,7 +48,7 @@ class _HomeScreenState extends State<HomeScreen> {
       key: 'bali',
       nama: 'Bahasa Bali',
       deskripsi: 'Temukan keindahan bahasa Bali',
-      imagePath: 'assets/images/bali.jpeg',
+      emoji: '🪷',
       warna: Color(0xFF8A2A2A),
       warnaGradient: Color(0xFFAA4A20),
       progress: 0.0,
@@ -92,16 +90,12 @@ class _HomeScreenState extends State<HomeScreen> {
           ],
         ),
       ),
-      bottomNavigationBar: LitariBottomNavBar(
-        currentIndex: _selectedNavIndex,
+      bottomNavigationBar: _BottomNavBar(
+        selectedIndex: _selectedNavIndex,
         onTap: (i) {
           if (i == 2) {
             Navigator.of(context).push(
               MaterialPageRoute(builder: (_) => const VideoScreen()),
-            );
-          } else if (i == 3) {
-            Navigator.of(context).push(
-              MaterialPageRoute(builder: (_) => const AksaraSundaScreen()),
             );
           } else if (i == 4) {
             Navigator.of(context).push(
@@ -115,25 +109,21 @@ class _HomeScreenState extends State<HomeScreen> {
     );
   }
 
-  // ── Header: LitariLogo instead of CustomPainter ──────────────
-
   Widget _buildHeader() {
     return Container(
       padding: const EdgeInsets.fromLTRB(20, 16, 20, 16),
       decoration: BoxDecoration(
         color: AppColors.background,
         border: Border(
-          bottom: BorderSide(
-              color: AppColors.divider.withOpacity(0.4), width: 0.5),
+          bottom: BorderSide(color: AppColors.divider.withValues(alpha: 0.4), width: 0.5),
         ),
       ),
       child: Row(
         children: [
-          // ← replaced CustomPaint(_MiniMascotPainter) with LitariLogo
-          const SizedBox(
+          SizedBox(
             width: 40,
             height: 40,
-            child: LitariLogo(showName: false, size : 40),
+            child: CustomPaint(painter: _MiniMascotPainter()),
           ),
           const SizedBox(width: 10),
           const Text(
@@ -146,41 +136,48 @@ class _HomeScreenState extends State<HomeScreen> {
             ),
           ),
           const Spacer(),
-          Container(
-            padding:
-                const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
-            decoration: BoxDecoration(
-              color: const Color(0xFF2C3347),
-              borderRadius: BorderRadius.circular(20),
-              border: Border.all(
-                  color: const Color(0xFFFFD700).withOpacity(0.4),
-                  width: 1),
-            ),
-            child: const Row(
-              children: [
-                Text('⚡', style: TextStyle(fontSize: 14)),
-                SizedBox(width: 4),
-                Text(
-                  '240 XP',
-                  style: TextStyle(
-                    color: Color(0xFFFFD700),
-                    fontSize: 13,
-                    fontWeight: FontWeight.bold,
+          StreamBuilder<DocumentSnapshot>(
+            stream: UserService.getUserStream(),
+            builder: (context, snapshot) {
+              final data = snapshot.data?.data() as Map<String, dynamic>? ?? {};
+              final username = data['username'] as String? ?? 'User';
+              final photoUrl = data['photoUrl'] as String? ?? '';
+
+              return Row(
+                children: [
+                  Container(
+                    width: 36,
+                    height: 36,
+                    decoration: BoxDecoration(
+                      color: AppColors.surfaceVariant,
+                      shape: BoxShape.circle,
+                      border: Border.all(color: AppColors.inputBorder),
+                    ),
+                    child: photoUrl.isNotEmpty
+                        ? ClipOval(
+                            child: Image.network(
+                              photoUrl,
+                              fit: BoxFit.cover,
+                              errorBuilder: (_, __, ___) => const Icon(
+                                  Icons.person,
+                                  color: Colors.white54,
+                                  size: 22),
+                            ),
+                          )
+                        : const Icon(Icons.person, color: Colors.white54, size: 22),
                   ),
-                ),
-              ],
-            ),
-          ),
-          const SizedBox(width: 10),
-          Container(
-            width: 36,
-            height: 36,
-            decoration: BoxDecoration(
-              color: AppColors.surfaceVariant,
-              borderRadius: BorderRadius.circular(10),
-            ),
-            child: const Icon(Icons.notifications_outlined,
-                color: Colors.white70, size: 20),
+                  const SizedBox(width: 8),
+                  Text(
+                    username,
+                    style: const TextStyle(
+                      color: Colors.white,
+                      fontSize: 14,
+                      fontWeight: FontWeight.w700,
+                    ),
+                  ),
+                ],
+              );
+            },
           ),
         ],
       ),
@@ -188,73 +185,87 @@ class _HomeScreenState extends State<HomeScreen> {
   }
 
   Widget _buildStreakBanner() {
-    return Container(
-      padding: const EdgeInsets.all(16),
-      decoration: BoxDecoration(
-        gradient: const LinearGradient(
-          colors: [Color(0xFF2C1A0E), Color(0xFF3D2A10)],
-          begin: Alignment.topLeft,
-          end: Alignment.bottomRight,
-        ),
-        borderRadius: BorderRadius.circular(16),
-        border:
-            Border.all(color: AppColors.primary.withOpacity(0.5), width: 1),
-      ),
-      child: Row(
-        children: [
-          Container(
-            width: 52,
-            height: 52,
-            decoration: BoxDecoration(
-              color: AppColors.primary.withOpacity(0.2),
-              borderRadius: BorderRadius.circular(14),
+    return StreamBuilder<DocumentSnapshot>(
+      stream: UserService.getUserStream(),
+      builder: (context, snapshot) {
+        final data = snapshot.data?.data() as Map<String, dynamic>? ?? {};
+        final streak = data['streak'] as int? ?? 0;
+
+        return Container(
+          padding: const EdgeInsets.all(16),
+          decoration: BoxDecoration(
+            gradient: const LinearGradient(
+              colors: [Color(0xFF2C1A0E), Color(0xFF3D2A10)],
+              begin: Alignment.topLeft,
+              end: Alignment.bottomRight,
             ),
-            child: const Center(
-              child: Text('🔥', style: TextStyle(fontSize: 28)),
-            ),
+            borderRadius: BorderRadius.circular(16),
+            border: Border.all(color: AppColors.primary.withValues(alpha: 0.5), width: 1),
           ),
-          const SizedBox(width: 14),
-          Expanded(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                const Text(
-                  'Streak 7 Hari! 🎉',
-                  style: TextStyle(
-                    color: Colors.white,
-                    fontSize: 16,
-                    fontWeight: FontWeight.w800,
-                  ),
+          child: Row(
+            children: [
+              Container(
+                width: 52,
+                height: 52,
+                decoration: BoxDecoration(
+                  color: AppColors.primary.withValues(alpha: 0.2),
+                  borderRadius: BorderRadius.circular(14),
                 ),
-                const SizedBox(height: 2),
-                Text(
-                  'Terus semangat! Belajar hari ini',
-                  style: TextStyle(
-                    color: Colors.white.withOpacity(0.6),
-                    fontSize: 13,
-                  ),
+                child: const Center(
+                  child: Text('🔥', style: TextStyle(fontSize: 28)),
                 ),
-              ],
-            ),
-          ),
-          Container(
-            padding:
-                const EdgeInsets.symmetric(horizontal: 14, vertical: 8),
-            decoration: BoxDecoration(
-              color: AppColors.primary,
-              borderRadius: BorderRadius.circular(10),
-            ),
-            child: const Text(
-              'Mulai',
-              style: TextStyle(
-                color: Colors.white,
-                fontWeight: FontWeight.bold,
-                fontSize: 14,
               ),
-            ),
+              const SizedBox(width: 14),
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      streak > 0 ? 'Streak $streak Hari! 🎉' : 'Mulai Streak Hari Ini!',
+                      style: const TextStyle(
+                        color: Colors.white,
+                        fontSize: 16,
+                        fontWeight: FontWeight.w800,
+                      ),
+                    ),
+                    const SizedBox(height: 2),
+                    Text(
+                      'Terus semangat! Belajar hari ini',
+                      style: TextStyle(
+                        color: Colors.white.withValues(alpha: 0.6),
+                        fontSize: 13,
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+              GestureDetector(
+                onTap: () {
+                  Navigator.of(context).push(
+                    MaterialPageRoute(
+                        builder: (_) => const MateriScreen(bahasaKey: 'sunda')),
+                  );
+                },
+                child: Container(
+                  padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 8),
+                  decoration: BoxDecoration(
+                    color: AppColors.primary,
+                    borderRadius: BorderRadius.circular(10),
+                  ),
+                  child: const Text(
+                    'Mulai',
+                    style: TextStyle(
+                      color: Colors.white,
+                      fontWeight: FontWeight.bold,
+                      fontSize: 14,
+                    ),
+                  ),
+                ),
+              ),
+            ],
           ),
-        ],
-      ),
+        );
+      },
     );
   }
 
@@ -273,8 +284,7 @@ class _HomeScreenState extends State<HomeScreen> {
     return GestureDetector(
       onTap: () {
         Navigator.of(context).push(
-          MaterialPageRoute(
-              builder: (_) => const MateriScreen(bahasaKey: 'sunda')),
+          MaterialPageRoute(builder: (_) => const MateriScreen(bahasaKey: 'sunda')),
         );
       },
       child: Container(
@@ -292,26 +302,7 @@ class _HomeScreenState extends State<HomeScreen> {
           children: [
             Row(
               children: [
-                // Image version of the "continue learning" banner
-                ClipRRect(
-                  borderRadius: BorderRadius.circular(10),
-                  child: Image.asset(
-                    'assets/images/sunda.png',
-                    width: 48,
-                    height: 48,
-                    fit: BoxFit.cover,
-                    errorBuilder: (_, error, ___) {
-                      debugPrint('Image load error: $error');
-                      return Container(
-                        color: card.warna,
-                        child: Center(
-                          child: Text(card.nama[0],
-                            style: const TextStyle(color: Colors.white, fontSize: 32)),
-                        ),
-                      );
-                    },
-                  ),
-                ),
+                const Text('🌋', style: TextStyle(fontSize: 32)),
                 const SizedBox(width: 12),
                 Expanded(
                   child: Column(
@@ -320,7 +311,6 @@ class _HomeScreenState extends State<HomeScreen> {
                       const Text(
                         'Bahasa Sunda',
                         style: TextStyle(
-                          //fontFamily: 'aksara_sunda',
                           color: Colors.white,
                           fontSize: 18,
                           fontWeight: FontWeight.w900,
@@ -330,7 +320,7 @@ class _HomeScreenState extends State<HomeScreen> {
                       Text(
                         'Materi 1 • 35% selesai',
                         style: TextStyle(
-                          color: Colors.white.withOpacity(0.75),
+                          color: Colors.white.withValues(alpha: 0.75),
                           fontSize: 13,
                         ),
                       ),
@@ -340,11 +330,10 @@ class _HomeScreenState extends State<HomeScreen> {
                 Container(
                   padding: const EdgeInsets.all(8),
                   decoration: BoxDecoration(
-                    color: Colors.white.withOpacity(0.2),
+                    color: Colors.white.withValues(alpha: 0.2),
                     borderRadius: BorderRadius.circular(10),
                   ),
-                  child: const Icon(Icons.play_arrow_rounded,
-                      color: Colors.white, size: 24),
+                  child: const Icon(Icons.play_arrow_rounded, color: Colors.white, size: 24),
                 ),
               ],
             ),
@@ -354,9 +343,8 @@ class _HomeScreenState extends State<HomeScreen> {
               child: LinearProgressIndicator(
                 value: 0.35,
                 minHeight: 8,
-                backgroundColor: Colors.white.withOpacity(0.25),
-                valueColor:
-                    const AlwaysStoppedAnimation<Color>(Colors.white),
+                backgroundColor: Colors.white.withValues(alpha: 0.25),
+                valueColor: const AlwaysStoppedAnimation<Color>(Colors.white),
               ),
             ),
           ],
@@ -373,101 +361,77 @@ class _HomeScreenState extends State<HomeScreen> {
       mainAxisSpacing: 12,
       crossAxisSpacing: 12,
       childAspectRatio: 1.1,
-      children: _bahasaList
-          .map((b) => _BahasaCardWidget(
-                card: b,
-                onTap: () {
-                  Navigator.of(context).push(
-                    MaterialPageRoute(
-                        builder: (_) => MateriScreen(bahasaKey: b.key)),
-                  );
-                },
-              ))
-          .toList(),
+      children: _bahasaList.map((b) => _BahasaCardWidget(
+        card: b,
+        onTap: () {
+          Navigator.of(context).push(
+            MaterialPageRoute(builder: (_) => MateriScreen(bahasaKey: b.key)),
+          );
+        },
+      )).toList(),
     );
   }
 
   Widget _buildDailyChallenge() {
-    return Container(
-      padding: const EdgeInsets.all(16),
-      decoration: BoxDecoration(
-        color: AppColors.surfaceVariant,
-        borderRadius: BorderRadius.circular(16),
-        border: Border.all(color: AppColors.inputBorder, width: 1),
-      ),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Row(
+    return StreamBuilder<DocumentSnapshot>(
+      stream: UserService.getUserStream(),
+      builder: (context, snapshot) {
+        final data = snapshot.data?.data() as Map<String, dynamic>? ?? {};
+        final totalMateri = data['totalMateriSelesai'] as int? ?? 0;
+        final xp = data['xp'] as int? ?? 0;
+
+        return Container(
+          padding: const EdgeInsets.all(16),
+          decoration: BoxDecoration(
+            color: AppColors.surfaceVariant,
+            borderRadius: BorderRadius.circular(16),
+            border: Border.all(color: AppColors.inputBorder, width: 1),
+          ),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              const Text('⚡', style: TextStyle(fontSize: 22)),
-              const SizedBox(width: 8),
-              const Text(
-                'Tantangan Harian',
-                style: TextStyle(
-                  color: Colors.white,
-                  fontSize: 16,
-                  fontWeight: FontWeight.w800,
-                ),
-              ),
-              const Spacer(),
-              Container(
-                padding:
-                    const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
-                decoration: BoxDecoration(
-                  color: const Color(0xFF2A8AAA).withOpacity(0.2),
-                  borderRadius: BorderRadius.circular(8),
-                ),
-                child: const Text(
-                  '50 XP',
-                  style: TextStyle(
-                    color: Color(0xFF2A8AAA),
-                    fontWeight: FontWeight.bold,
-                    fontSize: 13,
+              Row(
+                children: [
+                  const Text('⚡', style: TextStyle(fontSize: 22)),
+                  const SizedBox(width: 8),
+                  const Text(
+                    'Statistik Belajar',
+                    style: TextStyle(
+                      color: Colors.white,
+                      fontSize: 16,
+                      fontWeight: FontWeight.w800,
+                    ),
                   ),
+                  const Spacer(),
+                  Container(
+                    padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                    decoration: BoxDecoration(
+                      color: const Color(0xFF2A8AAA).withValues(alpha: 0.2),
+                      borderRadius: BorderRadius.circular(8),
+                    ),
+                    child: Text(
+                      '$xp XP',
+                      style: const TextStyle(
+                        color: Color(0xFF2A8AAA),
+                        fontWeight: FontWeight.bold,
+                        fontSize: 13,
+                      ),
+                    ),
+                  ),
+                ],
+              ),
+              const SizedBox(height: 10),
+              Text(
+                'Total materi selesai: $totalMateri',
+                style: TextStyle(
+                  color: Colors.white.withValues(alpha: 0.6),
+                  fontSize: 13,
                 ),
               ),
             ],
           ),
-          const SizedBox(height: 10),
-          Text(
-            'Selesaikan 5 latihan hari ini untuk menjaga streakmu!',
-            style: TextStyle(
-              color: Colors.white.withOpacity(0.6),
-              fontSize: 13,
-            ),
-          ),
-          const SizedBox(height: 12),
-          Row(
-            children: List.generate(
-              5,
-              (i) => Padding(
-                padding: const EdgeInsets.only(right: 8),
-                child: Container(
-                  width: 36,
-                  height: 36,
-                  decoration: BoxDecoration(
-                    color:
-                        i < 2 ? AppColors.primary : AppColors.surface,
-                    borderRadius: BorderRadius.circular(10),
-                    border: Border.all(
-                      color: i < 2
-                          ? AppColors.primary
-                          : AppColors.inputBorder,
-                      width: 1.5,
-                    ),
-                  ),
-                  child: Icon(
-                    i < 2 ? Icons.check : Icons.bolt_outlined,
-                    color: i < 2 ? Colors.white : Colors.white30,
-                    size: 18,
-                  ),
-                ),
-              ),
-            ),
-          ),
-        ],
-      ),
+        );
+      },
     );
   }
 }
@@ -478,7 +442,7 @@ class _BahasaCard {
   final String key;
   final String nama;
   final String deskripsi;
-  final String imagePath; // ← was emoji
+  final String emoji;
   final Color warna;
   final Color warnaGradient;
   final double progress;
@@ -487,14 +451,12 @@ class _BahasaCard {
     required this.key,
     required this.nama,
     required this.deskripsi,
-    required this.imagePath,
+    required this.emoji,
     required this.warna,
     required this.warnaGradient,
     required this.progress,
   });
 }
-
-// ─── Bahasa card widget ────────────────────────────────────────
 
 class _BahasaCardWidget extends StatelessWidget {
   final _BahasaCard card;
@@ -515,78 +477,145 @@ class _BahasaCardWidget extends StatelessWidget {
           ),
           borderRadius: BorderRadius.circular(16),
         ),
-        child: ClipRRect(
-          borderRadius: BorderRadius.circular(16),
-          child: Stack(
-            fit: StackFit.expand,
-            children: [
-              // Background image, faded into the gradient
-              Positioned.fill(
-                child: Image.asset(
-                  card.imagePath,
-                  fit: BoxFit.cover,
-                  alignment: Alignment.topCenter,
-                  errorBuilder: (_, __, ___) => const SizedBox.shrink(),
+        padding: const EdgeInsets.all(14),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Text(card.emoji, style: const TextStyle(fontSize: 30)),
+            const Spacer(),
+            Text(
+              card.nama,
+              style: const TextStyle(
+                color: Colors.white,
+                fontSize: 14,
+                fontWeight: FontWeight.w800,
+              ),
+            ),
+            const SizedBox(height: 6),
+            if (card.progress > 0) ...[
+              ClipRRect(
+                borderRadius: BorderRadius.circular(4),
+                child: LinearProgressIndicator(
+                  value: card.progress,
+                  minHeight: 5,
+                  backgroundColor: Colors.white.withValues(alpha: 0.25),
+                  valueColor: const AlwaysStoppedAnimation<Color>(Colors.white),
                 ),
               ),
-              // Dark overlay so text stays readable
-              Positioned.fill(
-                child: Container(
-                  decoration: BoxDecoration(
-                    gradient: LinearGradient(
-                      colors: [
-                        Colors.transparent,
-                        card.warna.withOpacity(0.85),
-                      ],
-                      begin: Alignment.topCenter,
-                      end: Alignment.bottomCenter,
-                    ),
-                  ),
-                ),
-              ),
-              // Text content pinned to the bottom
-              Positioned(
-                left: 12,
-                right: 12,
-                bottom: 12,
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  mainAxisSize: MainAxisSize.min,
-                  children: [
-                    Text(
-                      card.nama,
-                      style: const TextStyle(
-                        color: Colors.white,
-                        fontSize: 13,
-                        fontWeight: FontWeight.w800,
-                      ),
-                    ),
-                    const SizedBox(height: 6),
-                    if (card.progress > 0)
-                      ClipRRect(
-                        borderRadius: BorderRadius.circular(4),
-                        child: LinearProgressIndicator(
-                          value: card.progress,
-                          minHeight: 5,
-                          backgroundColor: Colors.white.withOpacity(0.25),
-                          valueColor: const AlwaysStoppedAnimation<Color>(
-                              Colors.white),
-                        ),
-                      )
-                    else
-                      Text(
-                        'Mulai belajar →',
-                        style: TextStyle(
-                          color: Colors.white.withOpacity(0.75),
-                          fontSize: 11,
-                          fontWeight: FontWeight.w600,
-                        ),
-                      ),
-                  ],
+            ] else ...[
+              Text(
+                'Mulai belajar →',
+                style: TextStyle(
+                  color: Colors.white.withValues(alpha: 0.75),
+                  fontSize: 11,
+                  fontWeight: FontWeight.w600,
                 ),
               ),
             ],
+          ],
+        ),
+      ),
+    );
+  }
+}
+
+// ─── Mini mascot untuk header ──────────────────────────────────
+
+class _MiniMascotPainter extends CustomPainter {
+  @override
+  void paint(Canvas canvas, Size size) {
+    final cx = size.width / 2;
+    final cy = size.height / 2;
+    final p = Paint()..color = const Color(0xFFE07B3A);
+    canvas.drawCircle(Offset(cx, cy - 4), 14, p);
+    canvas.drawOval(Rect.fromCenter(center: Offset(cx, cy + 8), width: 24, height: 18), p);
+    final belly = Paint()..color = const Color(0xFFF5DEB3);
+    canvas.drawOval(Rect.fromCenter(center: Offset(cx, cy - 2), width: 16, height: 13), belly);
+    final eye = Paint()..color = const Color(0xFF3D1A00);
+    canvas.drawCircle(Offset(cx - 4, cy - 6), 2, eye);
+    canvas.drawCircle(Offset(cx + 4, cy - 6), 2, eye);
+    final cape = Paint()..color = const Color(0xFFC0392B);
+    final capePath = Path()
+      ..moveTo(cx - 12, cy + 2)
+      ..quadraticBezierTo(cx, cy + 22, cx + 12, cy + 2)
+      ..quadraticBezierTo(cx + 8, cy + 18, cx, cy + 24)
+      ..quadraticBezierTo(cx - 8, cy + 18, cx - 12, cy + 2)
+      ..close();
+    canvas.drawPath(capePath, cape);
+  }
+
+  @override
+  bool shouldRepaint(covariant CustomPainter old) => false;
+}
+
+// ─── Bottom Navigation Bar ─────────────────────────────────────
+
+class _BottomNavBar extends StatelessWidget {
+  final int selectedIndex;
+  final void Function(int) onTap;
+
+  const _BottomNavBar({required this.selectedIndex, required this.onTap});
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      decoration: BoxDecoration(
+        color: AppColors.background,
+        border: Border(top: BorderSide(color: AppColors.divider, width: 0.5)),
+      ),
+      child: SafeArea(
+        top: false,
+        child: SizedBox(
+          height: 64,
+          child: Row(
+            mainAxisAlignment: MainAxisAlignment.spaceAround,
+            children: [
+              _NavItem(icon: Icons.home_rounded, index: 0, selected: selectedIndex == 0, onTap: onTap, color: const Color(0xFFE05252)),
+              _NavItem(icon: Icons.emoji_events_rounded, index: 1, selected: selectedIndex == 1, onTap: onTap, color: const Color(0xFFD4A017)),
+              _NavItem(icon: Icons.play_circle_filled, index: 2, selected: selectedIndex == 2, onTap: onTap, color: const Color(0xFF8B2BE2)),
+              _NavItem(icon: Icons.calculate_rounded, index: 3, selected: selectedIndex == 3, onTap: onTap, color: const Color(0xFF4CAF50)),
+              _NavItem(icon: Icons.person_rounded, index: 4, selected: selectedIndex == 4, onTap: onTap, color: Colors.white70),
+            ],
           ),
+        ),
+      ),
+    );
+  }
+}
+
+class _NavItem extends StatelessWidget {
+  final IconData icon;
+  final int index;
+  final bool selected;
+  final void Function(int) onTap;
+  final Color color;
+
+  const _NavItem({
+    required this.icon,
+    required this.index,
+    required this.selected,
+    required this.onTap,
+    required this.color,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return GestureDetector(
+      onTap: () => onTap(index),
+      behavior: HitTestBehavior.opaque,
+      child: AnimatedContainer(
+        duration: const Duration(milliseconds: 200),
+        padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 8),
+        decoration: selected
+            ? BoxDecoration(
+                color: color.withValues(alpha: 0.12),
+                borderRadius: BorderRadius.circular(12),
+              )
+            : null,
+        child: Icon(
+          icon,
+          color: selected ? color : Colors.white38,
+          size: 28,
         ),
       ),
     );

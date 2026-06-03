@@ -1,59 +1,61 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
-import 'package:litari/widgets/litari_bottom_nav_bar.dart';
 import '../services/user_service.dart';
 import '../theme/app_theme.dart';
-import 'splash_screen.dart';
-import 'home_screen.dart';
-import 'video_screen.dart';
-import 'aksara_sunda_screen.dart';
+
+// ID achievement yang ditampilkan di bagian "Lencana" (subset visual)
+const _lencanaIds = {
+  'materi_1':      {'color': Color(0xFFCD7F32), 'label': '1 Materi'},
+  'materi_5':      {'color': Color(0xFFC0C0C0), 'label': '5 Materi'},
+  'materi_10':     {'color': Color(0xFFFFD700), 'label': '10 Materi'},
+  'materi_25':     {'color': Color(0xFFE07B3A), 'label': '25 Materi'},
+  'lencana_sunda': {'color': Color(0xFF4CAF50), 'label': 'Sunda'},
+  'lencana_jawa':  {'color': Color(0xFFFF9800), 'label': 'Jawa'},
+  'lencana_melayu':{'color': Color(0xFF2196F3), 'label': 'Melayu'},
+  'lencana_bali':  {'color': Color(0xFFE91E63), 'label': 'Bali'},
+};
 
 class ProfilScreen extends StatelessWidget {
   const ProfilScreen({super.key});
 
   Future<void> _logout(BuildContext context) async {
-  final confirm = await showDialog<bool>(
-    context: context,
-    builder: (ctx) => AlertDialog(
-      backgroundColor: AppColors.surfaceVariant,
-      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
-      title: const Text(
-        'Keluar Akun',
-        style: TextStyle(color: Colors.white, fontWeight: FontWeight.w800),
-      ),
-      content: const Text(
-        'Kamu yakin ingin keluar?',
-        style: TextStyle(color: Colors.white70),
-      ),
-      actions: [
-        TextButton(
-          onPressed: () => Navigator.pop(ctx, false),
-          child: Text('Batal', style: TextStyle(color: AppColors.primary)),
+    final confirm = await showDialog<bool>(
+      context: context,
+      builder: (ctx) => AlertDialog(
+        backgroundColor: AppColors.surfaceVariant,
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+        title: const Text(
+          'Keluar Akun',
+          style: TextStyle(color: Colors.white, fontWeight: FontWeight.w800),
         ),
-        ElevatedButton(
-          onPressed: () => Navigator.pop(ctx, true),
-          style: ElevatedButton.styleFrom(
-            backgroundColor: Colors.redAccent,
-            shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(8)),
+        content: const Text(
+          'Kamu yakin ingin keluar?',
+          style: TextStyle(color: Colors.white70),
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(ctx, false),
+            child: Text('Batal', style: TextStyle(color: AppColors.primary)),
           ),
-          child: const Text('Keluar', style: TextStyle(color: Colors.white)),
-        ),
-      ],
-    ),
-  );
+          ElevatedButton(
+            onPressed: () => Navigator.pop(ctx, true),
+            style: ElevatedButton.styleFrom(
+              backgroundColor: Colors.redAccent,
+              shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(8)),
+            ),
+            child: const Text('Keluar', style: TextStyle(color: Colors.white)),
+          ),
+        ],
+      ),
+    );
 
-  if (confirm == true) {
-    await UserService.logout();
-    if (context.mounted) {
-      Navigator.of(context).pushAndRemoveUntil(
-        MaterialPageRoute(builder: (_) => const SplashScreen()),
-        (route) => false,
-      );
+    if (confirm == true) {
+      await UserService.logout();
+      // Tidak perlu navigasi manual — StreamBuilder di main.dart
+      // otomatis redirect ke SplashScreen saat auth state berubah ke null
     }
   }
-}
 
   @override
   Widget build(BuildContext context) {
@@ -65,34 +67,12 @@ class ProfilScreen extends StatelessWidget {
 
         return Scaffold(
           backgroundColor: AppColors.background,
-          bottomNavigationBar: LitariBottomNavBar(
-            currentIndex: 4,
-            onTap: (i) {
-              if (i == 0) {
-                Navigator.of(context).pushAndRemoveUntil(
-                  MaterialPageRoute(builder: (_) => const HomeScreen()),
-                  (route) => false,
-                );
-              } else if (i == 2) {
-                Navigator.of(context).push(
-                  MaterialPageRoute(builder: (_) => const VideoScreen()),
-                );
-              } else if (i == 3) {
-                Navigator.of(context).push(
-                  MaterialPageRoute(builder: (_) => const AksaraSundaScreen()),
-                );
-              } else if (i == 4) {
-                // Sudah di profil, tidak perlu navigasi
-              }
-            },
-          ),
           body: SafeArea(
             child: SingleChildScrollView(
               physics: const BouncingScrollPhysics(),
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  _buildTopBar(context),
                   _buildProfileHeader(context, data),
                   const SizedBox(height: 20),
                   _buildDaftarTeman(data),
@@ -111,28 +91,6 @@ class ProfilScreen extends StatelessWidget {
           ),
         );
       },
-    );
-  }
-
-  Widget _buildTopBar(BuildContext context) {
-    return Padding(
-      padding: const EdgeInsets.fromLTRB(4, 8, 16, 0),
-      child: Row(
-        children: [
-          IconButton(
-            icon: const Icon(Icons.arrow_back_ios_new, color: Colors.white),
-            onPressed: () => Navigator.of(context).pop(),
-          ),
-          const Text(
-            'Profil',
-            style: TextStyle(
-              color: Colors.white,
-              fontSize: 18,
-              fontWeight: FontWeight.w800,
-            ),
-          ),
-        ],
-      ),
     );
   }
 
@@ -299,7 +257,6 @@ class ProfilScreen extends StatelessWidget {
         Map<String, dynamic>.from(data['materiSelesai'] ?? {});
     final totalSelesai = data['totalMateriSelesai'] as int? ?? 0;
 
-    // Ambil 4 materi terakhir yang selesai
     final selesaiKeys = materiSelesai.keys
         .where((k) => materiSelesai[k] == true)
         .toList();
@@ -379,30 +336,10 @@ class ProfilScreen extends StatelessWidget {
   // ─── Lencana ───────────────────────────────────────
 
   Widget _buildLencana(Map<String, dynamic> data) {
-    final lencana = List<String>.from(data['lencana'] ?? []);
-
-    final lencanaDisplay = {
-      'misi_1': {'color': const Color(0xFFCD7F32), 'label': '1 Materi'},
-      'misi_3': {'color': const Color(0xFFC0C0C0), 'label': '3 Materi'},
-      'misi_5': {'color': const Color(0xFFFFD700), 'label': '5 Materi'},
-      'misi_10': {'color': AppColors.primary, 'label': '10 Materi'},
-      'lencana_sunda': {
-        'color': const Color(0xFF4CAF50),
-        'label': 'Sunda'
-      },
-      'lencana_jawa': {
-        'color': const Color(0xFFFF9800),
-        'label': 'Jawa'
-      },
-      'lencana_melayu': {
-        'color': const Color(0xFF2196F3),
-        'label': 'Melayu'
-      },
-      'lencana_bali': {
-        'color': const Color(0xFFE91E63),
-        'label': 'Bali'
-      },
-    };
+    final achievements = List<String>.from(data['achievements'] ?? []);
+    // Hitung hanya lencana yang ada di _lencanaIds (subset visual)
+    final lencanaDiraih =
+        achievements.where((id) => _lencanaIds.containsKey(id)).length;
 
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: 16),
@@ -421,7 +358,7 @@ class ProfilScreen extends StatelessWidget {
                 ),
               ),
               Text(
-                '${lencana.length} diraih',
+                '$lencanaDiraih diraih',
                 style: TextStyle(
                   color: AppColors.primary,
                   fontSize: 14,
@@ -434,8 +371,8 @@ class ProfilScreen extends StatelessWidget {
           Wrap(
             spacing: 12,
             runSpacing: 12,
-            children: lencanaDisplay.entries.map((e) {
-              final earned = lencana.contains(e.key);
+            children: _lencanaIds.entries.map((e) {
+              final earned = achievements.contains(e.key);
               final color = e.value['color'] as Color;
               final label = e.value['label'] as String;
               return _LencanaItem(
@@ -450,7 +387,7 @@ class ProfilScreen extends StatelessWidget {
   // ─── Pencapaian ────────────────────────────────────
 
   Widget _buildPencapaian(Map<String, dynamic> data) {
-    final lencana = List<String>.from(data['lencana'] ?? []);
+    final achievements = List<String>.from(data['achievements'] ?? []);
     final totalMateri = data['totalMateriSelesai'] as int? ?? 0;
     final xp = data['xp'] as int? ?? 0;
 
@@ -474,8 +411,8 @@ class ProfilScreen extends StatelessWidget {
                 child: _PencapaianCard(
                   icon: Icons.emoji_events_rounded,
                   color: const Color(0xFFFFD700),
-                  label: 'Lencana',
-                  value: '${lencana.length}',
+                  label: 'Achievement',
+                  value: '${achievements.length}',
                 ),
               ),
               const SizedBox(width: 12),
