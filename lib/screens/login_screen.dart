@@ -1,9 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
-import 'package:google_sign_in/google_sign_in.dart';
 import '../theme/app_theme.dart';
 import '../widgets/litari_logo.dart';
 import '../services/user_service.dart';
+import 'home_screen.dart';
 import 'register_screen.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 
@@ -45,6 +45,12 @@ class _LoginScreenState extends State<LoginScreen> {
         password: _passwordController.text.trim(),
       );
       await UserService.initUser(cred.user!);
+      if (mounted) {
+        Navigator.of(context).pushAndRemoveUntil(
+          MaterialPageRoute(builder: (_) => const HomeScreen()),
+          (route) => false,
+        );
+      }
     } on FirebaseAuthException catch (e) {
       setState(() {
         switch (e.code) {
@@ -58,9 +64,11 @@ class _LoginScreenState extends State<LoginScreen> {
             _errorMessage = 'Format email tidak valid';
             break;
           default:
-            _errorMessage = 'Login gagal, coba lagi';
+            _errorMessage = e.message ?? 'Login gagal, coba lagi';
         }
       });
+    } catch (e) {
+      setState(() => _errorMessage = e.toString());
     } finally {
       if (mounted) setState(() => _isLoading = false);
     }
@@ -73,25 +81,21 @@ class _LoginScreenState extends State<LoginScreen> {
     });
 
     try {
-      final GoogleSignInAccount? googleUser = await GoogleSignIn().signIn();
-      if (googleUser == null) {
-        setState(() => _isLoading = false);
-        return;
-      }
-
-      final GoogleSignInAuthentication googleAuth =
-          await googleUser.authentication;
-
-      final credential = GoogleAuthProvider.credential(
-        accessToken: googleAuth.accessToken,
-        idToken: googleAuth.idToken,
-      );
+      GoogleAuthProvider googleProvider = GoogleAuthProvider();
+      googleProvider.addScope('email');
+      googleProvider.addScope('profile');
 
       final cred =
-          await FirebaseAuth.instance.signInWithCredential(credential);
+          await FirebaseAuth.instance.signInWithPopup(googleProvider);
       await UserService.initUser(cred.user!);
+      if (mounted) {
+        Navigator.of(context).pushAndRemoveUntil(
+          MaterialPageRoute(builder: (_) => const HomeScreen()),
+          (route) => false,
+        );
+      }
     } catch (e) {
-      setState(() => _errorMessage = 'Login Google gagal, coba lagi');
+      setState(() => _errorMessage = 'Login Google gagal: $e');
     } finally {
       if (mounted) setState(() => _isLoading = false);
     }
@@ -222,7 +226,8 @@ class _LoginCard extends StatelessWidget {
               decoration: const InputDecoration(
                 border: InputBorder.none,
                 hintText: 'Email',
-                hintStyle: TextStyle(color: AppColors.textHint, fontSize: 16),
+                hintStyle:
+                    TextStyle(color: AppColors.textHint, fontSize: 16),
                 contentPadding: EdgeInsets.symmetric(vertical: 18),
               ),
             ),
@@ -237,8 +242,8 @@ class _LoginCard extends StatelessWidget {
               decoration: InputDecoration(
                 border: InputBorder.none,
                 hintText: 'Kata Sandi',
-                hintStyle:
-                    const TextStyle(color: AppColors.textHint, fontSize: 16),
+                hintStyle: const TextStyle(
+                    color: AppColors.textHint, fontSize: 16),
                 contentPadding: const EdgeInsets.symmetric(vertical: 18),
                 suffixIcon: IconButton(
                   icon: Icon(
