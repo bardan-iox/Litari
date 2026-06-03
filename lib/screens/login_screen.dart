@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:google_sign_in/google_sign_in.dart';
 import '../theme/app_theme.dart';
 import '../widgets/litari_logo.dart';
 import '../services/user_service.dart';
@@ -85,8 +86,17 @@ class _LoginScreenState extends State<LoginScreen> {
       googleProvider.addScope('email');
       googleProvider.addScope('profile');
 
-      final cred =
-          await FirebaseAuth.instance.signInWithPopup(googleProvider);
+      final googleUser = await GoogleSignIn().signIn();
+      if (googleUser == null) {
+        setState(() => _isLoading = false);
+        return;
+      }
+      final googleAuth = await googleUser.authentication;
+      final credential = GoogleAuthProvider.credential(
+        accessToken: googleAuth.accessToken,
+        idToken: googleAuth.idToken,
+      );
+      final cred = await FirebaseAuth.instance.signInWithCredential(credential);
       await UserService.initUser(cred.user!);
       if (mounted) {
         Navigator.of(context).pushAndRemoveUntil(

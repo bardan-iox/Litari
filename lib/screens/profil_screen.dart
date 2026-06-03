@@ -3,7 +3,7 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import '../services/user_service.dart';
 import '../theme/app_theme.dart';
-import 'splash_screen.dart';
+import 'login_screen.dart';
 
 class ProfilScreen extends StatelessWidget {
   const ProfilScreen({super.key});
@@ -41,10 +41,14 @@ class ProfilScreen extends StatelessWidget {
   );
 
   if (confirm == true) {
-    await UserService.logout();
+    try {
+      await UserService.logout();
+    } catch (e) {
+      debugPrint('Logout error: $e');
+    }
     if (context.mounted) {
       Navigator.of(context).pushAndRemoveUntil(
-        MaterialPageRoute(builder: (_) => const SplashScreen()),
+        MaterialPageRoute(builder: (_) => const LoginScreen()),
         (route) => false,
       );
     }
@@ -132,7 +136,6 @@ class ProfilScreen extends StatelessWidget {
       ),
       child: Column(
         children: [
-          // Avatar
           Container(
             width: 90,
             height: 90,
@@ -147,15 +150,12 @@ class ProfilScreen extends StatelessWidget {
                       photoUrl,
                       fit: BoxFit.cover,
                       errorBuilder: (_, __, ___) => const Icon(
-                          Icons.person,
-                          color: Colors.white54,
-                          size: 52),
+                          Icons.person, color: Colors.white54, size: 52),
                     ),
                   )
                 : const Icon(Icons.person, color: Colors.white54, size: 52),
           ),
           const SizedBox(height: 12),
-          // Username
           Text(
             username,
             style: const TextStyle(
@@ -165,15 +165,12 @@ class ProfilScreen extends StatelessWidget {
             ),
           ),
           const SizedBox(height: 4),
-          // XP chip
           Container(
-            padding:
-                const EdgeInsets.symmetric(horizontal: 12, vertical: 4),
+            padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 4),
             decoration: BoxDecoration(
               color: AppColors.primary.withOpacity(0.15),
               borderRadius: BorderRadius.circular(20),
-              border:
-                  Border.all(color: AppColors.primary.withOpacity(0.4)),
+              border: Border.all(color: AppColors.primary.withOpacity(0.4)),
             ),
             child: Text(
               '$xp XP',
@@ -190,10 +187,7 @@ class ProfilScreen extends StatelessWidget {
             children: [
               _StatBox(label: 'Teman', value: '$friends'),
               const SizedBox(width: 16),
-              _StatBox(
-                label: 'Streak',
-                value: '🔥 $streak',
-              ),
+              _StatBox(label: 'Streak', value: '🔥 $streak'),
             ],
           ),
         ],
@@ -245,21 +239,16 @@ class ProfilScreen extends StatelessWidget {
                   child: const Text(
                     'Belum ada teman. Cari dan tambah teman!',
                     textAlign: TextAlign.center,
-                    style:
-                        TextStyle(color: Colors.white54, fontSize: 13),
+                    style: TextStyle(color: Colors.white54, fontSize: 13),
                   ),
                 )
               : SizedBox(
                   height: 140,
                   child: ListView.separated(
                     scrollDirection: Axis.horizontal,
-                    itemCount: friendIds.length > 5
-                        ? 5
-                        : friendIds.length,
-                    separatorBuilder: (_, __) =>
-                        const SizedBox(width: 12),
-                    itemBuilder: (ctx, i) =>
-                        _TemanCardRemote(uid: friendIds[i]),
+                    itemCount: friendIds.length > 5 ? 5 : friendIds.length,
+                    separatorBuilder: (_, __) => const SizedBox(width: 12),
+                    itemBuilder: (ctx, i) => _TemanCardRemote(uid: friendIds[i]),
                   ),
                 ),
         ],
@@ -273,8 +262,6 @@ class ProfilScreen extends StatelessWidget {
     final materiSelesai =
         Map<String, dynamic>.from(data['materiSelesai'] ?? {});
     final totalSelesai = data['totalMateriSelesai'] as int? ?? 0;
-
-    // Ambil 4 materi terakhir yang selesai
     final selesaiKeys = materiSelesai.keys
         .where((k) => materiSelesai[k] == true)
         .toList();
@@ -304,8 +291,7 @@ class ProfilScreen extends StatelessWidget {
                   ),
                   child: const Text(
                     'Belum ada materi yang diselesaikan.',
-                    style:
-                        TextStyle(color: Colors.white54, fontSize: 13),
+                    style: TextStyle(color: Colors.white54, fontSize: 13),
                   ),
                 )
               : GridView.count(
@@ -323,8 +309,7 @@ class ProfilScreen extends StatelessWidget {
           const SizedBox(height: 10),
           Container(
             width: double.infinity,
-            padding:
-                const EdgeInsets.symmetric(vertical: 14, horizontal: 16),
+            padding: const EdgeInsets.symmetric(vertical: 14, horizontal: 16),
             decoration: BoxDecoration(
               color: AppColors.surface,
               borderRadius: BorderRadius.circular(10),
@@ -361,22 +346,10 @@ class ProfilScreen extends StatelessWidget {
       'misi_3': {'color': const Color(0xFFC0C0C0), 'label': '3 Materi'},
       'misi_5': {'color': const Color(0xFFFFD700), 'label': '5 Materi'},
       'misi_10': {'color': AppColors.primary, 'label': '10 Materi'},
-      'lencana_sunda': {
-        'color': const Color(0xFF4CAF50),
-        'label': 'Sunda'
-      },
-      'lencana_jawa': {
-        'color': const Color(0xFFFF9800),
-        'label': 'Jawa'
-      },
-      'lencana_melayu': {
-        'color': const Color(0xFF2196F3),
-        'label': 'Melayu'
-      },
-      'lencana_bali': {
-        'color': const Color(0xFFE91E63),
-        'label': 'Bali'
-      },
+      'lencana_sunda': {'color': const Color(0xFF4CAF50), 'label': 'Sunda'},
+      'lencana_jawa': {'color': const Color(0xFFFF9800), 'label': 'Jawa'},
+      'lencana_melayu': {'color': const Color(0xFF2196F3), 'label': 'Melayu'},
+      'lencana_bali': {'color': const Color(0xFFE91E63), 'label': 'Bali'},
     };
 
     return Padding(
@@ -413,8 +386,7 @@ class ProfilScreen extends StatelessWidget {
               final earned = lencana.contains(e.key);
               final color = e.value['color'] as Color;
               final label = e.value['label'] as String;
-              return _LencanaItem(
-                  color: color, label: label, earned: earned);
+              return _LencanaItem(color: color, label: label, earned: earned);
             }).toList(),
           ),
         ],
@@ -518,8 +490,7 @@ class _StatBox extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Container(
-      padding:
-          const EdgeInsets.symmetric(horizontal: 28, vertical: 10),
+      padding: const EdgeInsets.symmetric(horizontal: 28, vertical: 10),
       decoration: BoxDecoration(
         color: AppColors.surface,
         borderRadius: BorderRadius.circular(10),
@@ -545,7 +516,6 @@ class _StatBox extends StatelessWidget {
   }
 }
 
-/// Kartu teman yang load data dari Firestore berdasarkan UID
 class _TemanCardRemote extends StatelessWidget {
   final String uid;
   const _TemanCardRemote({required this.uid});
@@ -553,11 +523,9 @@ class _TemanCardRemote extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return FutureBuilder<DocumentSnapshot>(
-      future:
-          FirebaseFirestore.instance.collection('users').doc(uid).get(),
+      future: FirebaseFirestore.instance.collection('users').doc(uid).get(),
       builder: (ctx, snap) {
-        final data =
-            snap.data?.data() as Map<String, dynamic>? ?? {};
+        final data = snap.data?.data() as Map<String, dynamic>? ?? {};
         final name = data['username'] as String? ?? '…';
         final photo = data['photoUrl'] as String? ?? '';
 
@@ -584,11 +552,8 @@ class _TemanCardRemote extends StatelessWidget {
                         child: Image.network(photo,
                             fit: BoxFit.cover,
                             errorBuilder: (_, __, ___) => const Icon(
-                                Icons.person,
-                                color: Colors.white54,
-                                size: 28)))
-                    : const Icon(Icons.person,
-                        color: Colors.white54, size: 28),
+                                Icons.person, color: Colors.white54, size: 28)))
+                    : const Icon(Icons.person, color: Colors.white54, size: 28),
               ),
               const SizedBox(height: 8),
               Text(
@@ -653,9 +618,7 @@ class _LencanaItem extends StatelessWidget {
           height: 56,
           decoration: BoxDecoration(
             shape: BoxShape.circle,
-            color: earned
-                ? color.withOpacity(0.15)
-                : Colors.white10,
+            color: earned ? color.withOpacity(0.15) : Colors.white10,
             border: Border.all(
               color: earned ? color : Colors.white24,
               width: 2,
@@ -718,8 +681,7 @@ class _PencapaianCard extends StatelessWidget {
           const SizedBox(height: 2),
           Text(
             label,
-            style:
-                const TextStyle(color: Colors.white54, fontSize: 11),
+            style: const TextStyle(color: Colors.white54, fontSize: 11),
           ),
         ],
       ),
