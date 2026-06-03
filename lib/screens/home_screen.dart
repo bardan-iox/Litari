@@ -16,7 +16,8 @@ class HomeScreen extends StatefulWidget {
 class _HomeScreenState extends State<HomeScreen> {
   int _selectedNavIndex = 0;
 
-  static const List<_BahasaCard> _bahasaList = [
+  // Progress dihitung dinamis dari Firestore — lihat _hitungProgress()
+  static const List<_BahasaCard> _bahasaCardDefs = [
     _BahasaCard(
       key: 'sunda',
       nama: 'Bahasa Sunda',
@@ -24,7 +25,6 @@ class _HomeScreenState extends State<HomeScreen> {
       emoji: '🌋',
       warna: Color(0xFF9B5B2E),
       warnaGradient: Color(0xFFCA8A3A),
-      progress: 0.35,
     ),
     _BahasaCard(
       key: 'jawa',
@@ -33,7 +33,6 @@ class _HomeScreenState extends State<HomeScreen> {
       emoji: '🏯',
       warna: Color(0xFF3A8A2E),
       warnaGradient: Color(0xFFCA9B20),
-      progress: 0.0,
     ),
     _BahasaCard(
       key: 'melayu',
@@ -42,7 +41,6 @@ class _HomeScreenState extends State<HomeScreen> {
       emoji: '⛵',
       warna: Color(0xFF1A6B8A),
       warnaGradient: Color(0xFF2A8AAA),
-      progress: 0.0,
     ),
     _BahasaCard(
       key: 'bali',
@@ -51,7 +49,6 @@ class _HomeScreenState extends State<HomeScreen> {
       emoji: '🪷',
       warna: Color(0xFF8A2A2A),
       warnaGradient: Color(0xFFAA4A20),
-      progress: 0.0,
     ),
   ];
 
@@ -190,6 +187,7 @@ class _HomeScreenState extends State<HomeScreen> {
       builder: (context, snapshot) {
         final data = snapshot.data?.data() as Map<String, dynamic>? ?? {};
         final streak = data['streak'] as int? ?? 0;
+        final lastBahasaStreak = data['lastBahasa'] as String? ?? 'sunda';
 
         return Container(
           padding: const EdgeInsets.all(16),
@@ -243,7 +241,7 @@ class _HomeScreenState extends State<HomeScreen> {
                 onTap: () {
                   Navigator.of(context).push(
                     MaterialPageRoute(
-                        builder: (_) => const MateriScreen(bahasaKey: 'sunda')),
+                        builder: (_) => MateriScreen(bahasaKey: lastBahasaStreak)),
                   );
                 },
                 child: Container(
@@ -281,94 +279,148 @@ class _HomeScreenState extends State<HomeScreen> {
   }
 
   Widget _buildContinueLearning() {
-    return GestureDetector(
-      onTap: () {
-        Navigator.of(context).push(
-          MaterialPageRoute(builder: (_) => const MateriScreen(bahasaKey: 'sunda')),
-        );
-      },
-      child: Container(
-        padding: const EdgeInsets.all(16),
-        decoration: BoxDecoration(
-          gradient: const LinearGradient(
-            colors: [Color(0xFF9B5B2E), Color(0xFFCA8A3A)],
-            begin: Alignment.topLeft,
-            end: Alignment.bottomRight,
-          ),
-          borderRadius: BorderRadius.circular(16),
-        ),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Row(
+    return StreamBuilder<DocumentSnapshot>(
+      stream: UserService.getUserStream(),
+      builder: (context, snapshot) {
+        final data = snapshot.data?.data() as Map<String, dynamic>? ?? {};
+        final materiSelesai = Map<String, dynamic>.from(data['materiSelesai'] ?? {});
+
+        // Ambil bahasa & materi terakhir user, fallback ke sunda jika belum pernah belajar
+        final lastBahasa = data['lastBahasa'] as String? ?? 'sunda';
+        final lastMateri = data['lastMateri'] as String? ?? 'Materi 1';
+        final info = _bahasaInfo[lastBahasa] ?? _bahasaInfo['sunda']!;
+
+        final progress = _hitungProgress(materiSelesai, lastBahasa);
+        final persen = (progress * 100).round();
+
+        return GestureDetector(
+          onTap: () {
+            Navigator.of(context).push(
+              MaterialPageRoute(builder: (_) => MateriScreen(bahasaKey: lastBahasa)),
+            );
+          },
+          child: Container(
+            padding: const EdgeInsets.all(16),
+            decoration: BoxDecoration(
+              gradient: LinearGradient(
+                colors: [info['warna1'] as Color, info['warna2'] as Color],
+                begin: Alignment.topLeft,
+                end: Alignment.bottomRight,
+              ),
+              borderRadius: BorderRadius.circular(16),
+            ),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                const Text('🌋', style: TextStyle(fontSize: 32)),
-                const SizedBox(width: 12),
-                Expanded(
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      const Text(
-                        'Bahasa Sunda',
-                        style: TextStyle(
-                          color: Colors.white,
-                          fontSize: 18,
-                          fontWeight: FontWeight.w900,
-                        ),
+                Row(
+                  children: [
+                    Text(info['emoji'] as String, style: const TextStyle(fontSize: 32)),
+                    const SizedBox(width: 12),
+                    Expanded(
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text(
+                            info['nama'] as String,
+                            style: const TextStyle(
+                              color: Colors.white,
+                              fontSize: 18,
+                              fontWeight: FontWeight.w900,
+                            ),
+                          ),
+                          const SizedBox(height: 2),
+                          Text(
+                            progress == 0
+                                ? 'Mulai belajar'
+                                : '$lastMateri • $persen% selesai',
+                            style: TextStyle(
+                              color: Colors.white.withValues(alpha: 0.75),
+                              fontSize: 13,
+                            ),
+                          ),
+                        ],
                       ),
-                      const SizedBox(height: 2),
-                      Text(
-                        'Materi 1 • 35% selesai',
-                        style: TextStyle(
-                          color: Colors.white.withValues(alpha: 0.75),
-                          fontSize: 13,
-                        ),
+                    ),
+                    Container(
+                      padding: const EdgeInsets.all(8),
+                      decoration: BoxDecoration(
+                        color: Colors.white.withValues(alpha: 0.2),
+                        borderRadius: BorderRadius.circular(10),
                       ),
-                    ],
-                  ),
+                      child: const Icon(Icons.play_arrow_rounded, color: Colors.white, size: 24),
+                    ),
+                  ],
                 ),
-                Container(
-                  padding: const EdgeInsets.all(8),
-                  decoration: BoxDecoration(
-                    color: Colors.white.withValues(alpha: 0.2),
-                    borderRadius: BorderRadius.circular(10),
+                const SizedBox(height: 14),
+                ClipRRect(
+                  borderRadius: BorderRadius.circular(6),
+                  child: LinearProgressIndicator(
+                    value: progress,
+                    minHeight: 8,
+                    backgroundColor: Colors.white.withValues(alpha: 0.25),
+                    valueColor: const AlwaysStoppedAnimation<Color>(Colors.white),
                   ),
-                  child: const Icon(Icons.play_arrow_rounded, color: Colors.white, size: 24),
                 ),
               ],
             ),
-            const SizedBox(height: 14),
-            ClipRRect(
-              borderRadius: BorderRadius.circular(6),
-              child: LinearProgressIndicator(
-                value: 0.35,
-                minHeight: 8,
-                backgroundColor: Colors.white.withValues(alpha: 0.25),
-                valueColor: const AlwaysStoppedAnimation<Color>(Colors.white),
-              ),
-            ),
-          ],
-        ),
-      ),
+          ),
+        );
+      },
     );
   }
 
+  static const Map<String, Map<String, dynamic>> _bahasaInfo = {
+    'sunda':  {'nama': 'Bahasa Sunda', 'emoji': '🌋', 'warna1': Color(0xFF9B5B2E), 'warna2': Color(0xFFCA8A3A)},
+    'jawa':   {'nama': 'Bahasa Jawa',  'emoji': '🏯', 'warna1': Color(0xFF3A8A2E), 'warna2': Color(0xFFCA9B20)},
+    'melayu': {'nama': 'Bahasa Melayu','emoji': '⛵', 'warna1': Color(0xFF1A6B8A), 'warna2': Color(0xFF2A8AAA)},
+    'bali':   {'nama': 'Bahasa Bali',  'emoji': '🪷', 'warna1': Color(0xFF8A2A2A), 'warna2': Color(0xFFAA4A20)},
+  };
+
+  /// Jumlah total sub-materi per bahasa (harus sinkron dengan user_service.dart)
+  static const Map<String, int> _totalMateriPerBahasa = {
+    'sunda': 27,
+    'jawa': 9,
+    'melayu': 6,
+    'bali': 6,
+  };
+
+  /// Hitung progress (0.0–1.0) per bahasa dari field materiSelesai Firestore.
+  double _hitungProgress(Map<String, dynamic> materiSelesai, String bahasaKey) {
+    final total = _totalMateriPerBahasa[bahasaKey] ?? 1;
+    final selesai = materiSelesai.keys
+        .where((k) => k.startsWith('$bahasaKey.') && materiSelesai[k] == true)
+        .length;
+    return (selesai / total).clamp(0.0, 1.0);
+  }
+
   Widget _buildBahasaGrid() {
-    return GridView.count(
-      crossAxisCount: 2,
-      shrinkWrap: true,
-      physics: const NeverScrollableScrollPhysics(),
-      mainAxisSpacing: 12,
-      crossAxisSpacing: 12,
-      childAspectRatio: 1.1,
-      children: _bahasaList.map((b) => _BahasaCardWidget(
-        card: b,
-        onTap: () {
-          Navigator.of(context).push(
-            MaterialPageRoute(builder: (_) => MateriScreen(bahasaKey: b.key)),
-          );
-        },
-      )).toList(),
+    return StreamBuilder<DocumentSnapshot>(
+      stream: UserService.getUserStream(),
+      builder: (context, snapshot) {
+        final data = snapshot.data?.data() as Map<String, dynamic>? ?? {};
+        final materiSelesai = Map<String, dynamic>.from(data['materiSelesai'] ?? {});
+
+        final cards = _bahasaCardDefs.map((b) =>
+          b.withProgress(_hitungProgress(materiSelesai, b.key))
+        ).toList();
+
+        return GridView.count(
+          crossAxisCount: 2,
+          shrinkWrap: true,
+          physics: const NeverScrollableScrollPhysics(),
+          mainAxisSpacing: 12,
+          crossAxisSpacing: 12,
+          childAspectRatio: 1.1,
+          children: cards.map((b) => _BahasaCardWidget(
+            card: b,
+            onTap: () {
+              Navigator.of(context).push(
+                MaterialPageRoute(builder: (_) => MateriScreen(bahasaKey: b.key)),
+              );
+            },
+          )).toList(),
+        );
+      },
     );
   }
 
@@ -454,8 +506,14 @@ class _BahasaCard {
     required this.emoji,
     required this.warna,
     required this.warnaGradient,
-    required this.progress,
+    this.progress = 0.0,
   });
+
+  _BahasaCard withProgress(double p) => _BahasaCard(
+    key: key, nama: nama, deskripsi: deskripsi,
+    emoji: emoji, warna: warna, warnaGradient: warnaGradient,
+    progress: p,
+  );
 }
 
 class _BahasaCardWidget extends StatelessWidget {

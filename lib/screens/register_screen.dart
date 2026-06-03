@@ -72,8 +72,11 @@ class _RegisterScreenState extends State<RegisterScreen> {
           case 'weak-password':
             _errorMessage = 'Kata sandi terlalu lemah';
             break;
+          case 'too-many-requests':
+            _errorMessage = 'Terlalu banyak percobaan, coba lagi nanti';
+            break;
           default:
-            _errorMessage = e.message ?? 'Registrasi gagal, coba lagi';
+            _errorMessage = 'Registrasi gagal, coba lagi';
         }
       });
     } catch (e) {

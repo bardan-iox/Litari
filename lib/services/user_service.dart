@@ -214,6 +214,8 @@ class UserService {
         'totalMateriSelesai': 0,
         'totalLatihan':      0,           // jumlah sesi latihan selesai
         'totalSempurna':     0,           // jumlah sesi latihan skor 100%
+        'lastBahasa':        'sunda',     // bahasa terakhir dipelajari
+        'lastMateri':        'Materi 1',  // materi terakhir dipelajari
       });
     } else {
       await _updateStreak(user.uid);
@@ -328,6 +330,18 @@ class UserService {
   ///
   /// Mengembalikan [HasilLatihan] berisi XP yang didapat dan
   /// daftar achievement baru yang baru saja terbuka.
+  /// Simpan bahasa & materi terakhir dipelajari (dipanggil saat user buka materi).
+  static Future<void> simpanLastBahasa({
+    required String bahasaKey,
+    required String namaMateri,
+  }) async {
+    if (currentUid == null) return;
+    await _db.collection('users').doc(currentUid).update({
+      'lastBahasa':  bahasaKey,
+      'lastMateri':  namaMateri,
+    });
+  }
+
   static Future<HasilLatihan> selesaikanLatihan({
     required int benar,
     required int total,
@@ -438,6 +452,8 @@ class UserService {
       'materiSelesai':     materiSelesai,
       'totalMateriSelesai': totalMateriSelesai,
       'achievements':      achievementLama,
+      'lastBahasa':        bahasaKey,
+      'lastMateri':        materiKey,
       'lastActive':        FieldValue.serverTimestamp(),
     });
 
