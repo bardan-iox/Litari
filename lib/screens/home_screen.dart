@@ -1,11 +1,10 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import '../theme/app_theme.dart';
-import '../widgets/litari_logo.dart';
-import 'pilih_bahasa_screen.dart';
+import '../services/user_service.dart';
 import 'materi_screen.dart';
 import 'profil_screen.dart';
 import 'video_screen.dart';
-
 
 class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});
@@ -92,25 +91,21 @@ class _HomeScreenState extends State<HomeScreen> {
         ),
       ),
       bottomNavigationBar: _BottomNavBar(
-  selectedIndex: _selectedNavIndex,
-  onTap: (i) {
-    if (i == 2) {
-      Navigator.of(context).push(
-        MaterialPageRoute(
-          builder: (_) => const VideoScreen(),
-        ),
-      );
-    } else if (i == 4) {
-      Navigator.of(context).push(
-        MaterialPageRoute(
-          builder: (_) => const ProfilScreen(),
-        ),
-      );
-    } else {
-      setState(() => _selectedNavIndex = i);
-    }
-  },
-),
+        selectedIndex: _selectedNavIndex,
+        onTap: (i) {
+          if (i == 2) {
+            Navigator.of(context).push(
+              MaterialPageRoute(builder: (_) => const VideoScreen()),
+            );
+          } else if (i == 4) {
+            Navigator.of(context).push(
+              MaterialPageRoute(builder: (_) => const ProfilScreen()),
+            );
+          } else {
+            setState(() => _selectedNavIndex = i);
+          }
+        },
+      ),
     );
   }
 
@@ -120,7 +115,7 @@ class _HomeScreenState extends State<HomeScreen> {
       decoration: BoxDecoration(
         color: AppColors.background,
         border: Border(
-          bottom: BorderSide(color: AppColors.divider.withOpacity(0.4), width: 0.5),
+          bottom: BorderSide(color: AppColors.divider.withValues(alpha: 0.4), width: 0.5),
         ),
       ),
       child: Row(
@@ -141,37 +136,48 @@ class _HomeScreenState extends State<HomeScreen> {
             ),
           ),
           const Spacer(),
-          Container(
-            padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
-            decoration: BoxDecoration(
-              color: const Color(0xFF2C3347),
-              borderRadius: BorderRadius.circular(20),
-              border: Border.all(color: const Color(0xFFFFD700).withOpacity(0.4), width: 1),
-            ),
-            child: Row(
-              children: const [
-                Text('⚡', style: TextStyle(fontSize: 14)),
-                SizedBox(width: 4),
-                Text(
-                  '240 XP',
-                  style: TextStyle(
-                    color: Color(0xFFFFD700),
-                    fontSize: 13,
-                    fontWeight: FontWeight.bold,
+          StreamBuilder<DocumentSnapshot>(
+            stream: UserService.getUserStream(),
+            builder: (context, snapshot) {
+              final data = snapshot.data?.data() as Map<String, dynamic>? ?? {};
+              final username = data['username'] as String? ?? 'User';
+              final photoUrl = data['photoUrl'] as String? ?? '';
+
+              return Row(
+                children: [
+                  Container(
+                    width: 36,
+                    height: 36,
+                    decoration: BoxDecoration(
+                      color: AppColors.surfaceVariant,
+                      shape: BoxShape.circle,
+                      border: Border.all(color: AppColors.inputBorder),
+                    ),
+                    child: photoUrl.isNotEmpty
+                        ? ClipOval(
+                            child: Image.network(
+                              photoUrl,
+                              fit: BoxFit.cover,
+                              errorBuilder: (_, __, ___) => const Icon(
+                                  Icons.person,
+                                  color: Colors.white54,
+                                  size: 22),
+                            ),
+                          )
+                        : const Icon(Icons.person, color: Colors.white54, size: 22),
                   ),
-                ),
-              ],
-            ),
-          ),
-          const SizedBox(width: 10),
-          Container(
-            width: 36,
-            height: 36,
-            decoration: BoxDecoration(
-              color: AppColors.surfaceVariant,
-              borderRadius: BorderRadius.circular(10),
-            ),
-            child: const Icon(Icons.notifications_outlined, color: Colors.white70, size: 20),
+                  const SizedBox(width: 8),
+                  Text(
+                    username,
+                    style: const TextStyle(
+                      color: Colors.white,
+                      fontSize: 14,
+                      fontWeight: FontWeight.w700,
+                    ),
+                  ),
+                ],
+              );
+            },
           ),
         ],
       ),
@@ -179,71 +185,87 @@ class _HomeScreenState extends State<HomeScreen> {
   }
 
   Widget _buildStreakBanner() {
-    return Container(
-      padding: const EdgeInsets.all(16),
-      decoration: BoxDecoration(
-        gradient: const LinearGradient(
-          colors: [Color(0xFF2C1A0E), Color(0xFF3D2A10)],
-          begin: Alignment.topLeft,
-          end: Alignment.bottomRight,
-        ),
-        borderRadius: BorderRadius.circular(16),
-        border: Border.all(color: AppColors.primary.withOpacity(0.5), width: 1),
-      ),
-      child: Row(
-        children: [
-          Container(
-            width: 52,
-            height: 52,
-            decoration: BoxDecoration(
-              color: AppColors.primary.withOpacity(0.2),
-              borderRadius: BorderRadius.circular(14),
+    return StreamBuilder<DocumentSnapshot>(
+      stream: UserService.getUserStream(),
+      builder: (context, snapshot) {
+        final data = snapshot.data?.data() as Map<String, dynamic>? ?? {};
+        final streak = data['streak'] as int? ?? 0;
+
+        return Container(
+          padding: const EdgeInsets.all(16),
+          decoration: BoxDecoration(
+            gradient: const LinearGradient(
+              colors: [Color(0xFF2C1A0E), Color(0xFF3D2A10)],
+              begin: Alignment.topLeft,
+              end: Alignment.bottomRight,
             ),
-            child: const Center(
-              child: Text('🔥', style: TextStyle(fontSize: 28)),
-            ),
+            borderRadius: BorderRadius.circular(16),
+            border: Border.all(color: AppColors.primary.withValues(alpha: 0.5), width: 1),
           ),
-          const SizedBox(width: 14),
-          Expanded(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                const Text(
-                  'Streak 7 Hari! 🎉',
-                  style: TextStyle(
-                    color: Colors.white,
-                    fontSize: 16,
-                    fontWeight: FontWeight.w800,
-                  ),
+          child: Row(
+            children: [
+              Container(
+                width: 52,
+                height: 52,
+                decoration: BoxDecoration(
+                  color: AppColors.primary.withValues(alpha: 0.2),
+                  borderRadius: BorderRadius.circular(14),
                 ),
-                const SizedBox(height: 2),
-                Text(
-                  'Terus semangat! Belajar hari ini',
-                  style: TextStyle(
-                    color: Colors.white.withOpacity(0.6),
-                    fontSize: 13,
-                  ),
+                child: const Center(
+                  child: Text('🔥', style: TextStyle(fontSize: 28)),
                 ),
-              ],
-            ),
-          ),
-          Container(
-            padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 8),
-            decoration: BoxDecoration(
-              color: AppColors.primary,
-              borderRadius: BorderRadius.circular(10),
-            ),
-            child: const Text(
-              'Mulai',
-              style: TextStyle(
-                color: Colors.white,
-                fontWeight: FontWeight.bold,
-                fontSize: 14,
               ),
-            ),
+              const SizedBox(width: 14),
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      streak > 0 ? 'Streak $streak Hari! 🎉' : 'Mulai Streak Hari Ini!',
+                      style: const TextStyle(
+                        color: Colors.white,
+                        fontSize: 16,
+                        fontWeight: FontWeight.w800,
+                      ),
+                    ),
+                    const SizedBox(height: 2),
+                    Text(
+                      'Terus semangat! Belajar hari ini',
+                      style: TextStyle(
+                        color: Colors.white.withValues(alpha: 0.6),
+                        fontSize: 13,
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+              GestureDetector(
+                onTap: () {
+                  Navigator.of(context).push(
+                    MaterialPageRoute(
+                        builder: (_) => const MateriScreen(bahasaKey: 'sunda')),
+                  );
+                },
+                child: Container(
+                  padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 8),
+                  decoration: BoxDecoration(
+                    color: AppColors.primary,
+                    borderRadius: BorderRadius.circular(10),
+                  ),
+                  child: const Text(
+                    'Mulai',
+                    style: TextStyle(
+                      color: Colors.white,
+                      fontWeight: FontWeight.bold,
+                      fontSize: 14,
+                    ),
+                  ),
+                ),
+              ),
+            ],
           ),
-        ],
-      ),
+        );
+      },
     );
   }
 
@@ -298,7 +320,7 @@ class _HomeScreenState extends State<HomeScreen> {
                       Text(
                         'Materi 1 • 35% selesai',
                         style: TextStyle(
-                          color: Colors.white.withOpacity(0.75),
+                          color: Colors.white.withValues(alpha: 0.75),
                           fontSize: 13,
                         ),
                       ),
@@ -308,7 +330,7 @@ class _HomeScreenState extends State<HomeScreen> {
                 Container(
                   padding: const EdgeInsets.all(8),
                   decoration: BoxDecoration(
-                    color: Colors.white.withOpacity(0.2),
+                    color: Colors.white.withValues(alpha: 0.2),
                     borderRadius: BorderRadius.circular(10),
                   ),
                   child: const Icon(Icons.play_arrow_rounded, color: Colors.white, size: 24),
@@ -321,7 +343,7 @@ class _HomeScreenState extends State<HomeScreen> {
               child: LinearProgressIndicator(
                 value: 0.35,
                 minHeight: 8,
-                backgroundColor: Colors.white.withOpacity(0.25),
+                backgroundColor: Colors.white.withValues(alpha: 0.25),
                 valueColor: const AlwaysStoppedAnimation<Color>(Colors.white),
               ),
             ),
@@ -351,79 +373,65 @@ class _HomeScreenState extends State<HomeScreen> {
   }
 
   Widget _buildDailyChallenge() {
-    return Container(
-      padding: const EdgeInsets.all(16),
-      decoration: BoxDecoration(
-        color: AppColors.surfaceVariant,
-        borderRadius: BorderRadius.circular(16),
-        border: Border.all(color: AppColors.inputBorder, width: 1),
-      ),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Row(
+    return StreamBuilder<DocumentSnapshot>(
+      stream: UserService.getUserStream(),
+      builder: (context, snapshot) {
+        final data = snapshot.data?.data() as Map<String, dynamic>? ?? {};
+        final totalMateri = data['totalMateriSelesai'] as int? ?? 0;
+        final xp = data['xp'] as int? ?? 0;
+
+        return Container(
+          padding: const EdgeInsets.all(16),
+          decoration: BoxDecoration(
+            color: AppColors.surfaceVariant,
+            borderRadius: BorderRadius.circular(16),
+            border: Border.all(color: AppColors.inputBorder, width: 1),
+          ),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              const Text('⚡', style: TextStyle(fontSize: 22)),
-              const SizedBox(width: 8),
-              const Text(
-                'Tantangan Harian',
-                style: TextStyle(
-                  color: Colors.white,
-                  fontSize: 16,
-                  fontWeight: FontWeight.w800,
-                ),
-              ),
-              const Spacer(),
-              Container(
-                padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
-                decoration: BoxDecoration(
-                  color: const Color(0xFF2A8AAA).withOpacity(0.2),
-                  borderRadius: BorderRadius.circular(8),
-                ),
-                child: const Text(
-                  '50 XP',
-                  style: TextStyle(
-                    color: Color(0xFF2A8AAA),
-                    fontWeight: FontWeight.bold,
-                    fontSize: 13,
+              Row(
+                children: [
+                  const Text('⚡', style: TextStyle(fontSize: 22)),
+                  const SizedBox(width: 8),
+                  const Text(
+                    'Statistik Belajar',
+                    style: TextStyle(
+                      color: Colors.white,
+                      fontSize: 16,
+                      fontWeight: FontWeight.w800,
+                    ),
                   ),
+                  const Spacer(),
+                  Container(
+                    padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                    decoration: BoxDecoration(
+                      color: const Color(0xFF2A8AAA).withValues(alpha: 0.2),
+                      borderRadius: BorderRadius.circular(8),
+                    ),
+                    child: Text(
+                      '$xp XP',
+                      style: const TextStyle(
+                        color: Color(0xFF2A8AAA),
+                        fontWeight: FontWeight.bold,
+                        fontSize: 13,
+                      ),
+                    ),
+                  ),
+                ],
+              ),
+              const SizedBox(height: 10),
+              Text(
+                'Total materi selesai: $totalMateri',
+                style: TextStyle(
+                  color: Colors.white.withValues(alpha: 0.6),
+                  fontSize: 13,
                 ),
               ),
             ],
           ),
-          const SizedBox(height: 10),
-          Text(
-            'Selesaikan 5 latihan hari ini untuk menjaga streakmu!',
-            style: TextStyle(
-              color: Colors.white.withOpacity(0.6),
-              fontSize: 13,
-            ),
-          ),
-          const SizedBox(height: 12),
-          Row(
-            children: List.generate(5, (i) => Padding(
-              padding: const EdgeInsets.only(right: 8),
-              child: Container(
-                width: 36,
-                height: 36,
-                decoration: BoxDecoration(
-                  color: i < 2 ? AppColors.primary : AppColors.surface,
-                  borderRadius: BorderRadius.circular(10),
-                  border: Border.all(
-                    color: i < 2 ? AppColors.primary : AppColors.inputBorder,
-                    width: 1.5,
-                  ),
-                ),
-                child: Icon(
-                  i < 2 ? Icons.check : Icons.bolt_outlined,
-                  color: i < 2 ? Colors.white : Colors.white30,
-                  size: 18,
-                ),
-              ),
-            )),
-          ),
-        ],
-      ),
+        );
+      },
     );
   }
 }
@@ -490,7 +498,7 @@ class _BahasaCardWidget extends StatelessWidget {
                 child: LinearProgressIndicator(
                   value: card.progress,
                   minHeight: 5,
-                  backgroundColor: Colors.white.withOpacity(0.25),
+                  backgroundColor: Colors.white.withValues(alpha: 0.25),
                   valueColor: const AlwaysStoppedAnimation<Color>(Colors.white),
                 ),
               ),
@@ -498,7 +506,7 @@ class _BahasaCardWidget extends StatelessWidget {
               Text(
                 'Mulai belajar →',
                 style: TextStyle(
-                  color: Colors.white.withOpacity(0.75),
+                  color: Colors.white.withValues(alpha: 0.75),
                   fontSize: 11,
                   fontWeight: FontWeight.w600,
                 ),
@@ -562,11 +570,11 @@ class _BottomNavBar extends StatelessWidget {
           child: Row(
             mainAxisAlignment: MainAxisAlignment.spaceAround,
             children: [
-              _NavItem(icon: Icons.home_rounded,        index: 0, selected: selectedIndex == 0, onTap: onTap, color: const Color(0xFFE05252)),
+              _NavItem(icon: Icons.home_rounded, index: 0, selected: selectedIndex == 0, onTap: onTap, color: const Color(0xFFE05252)),
               _NavItem(icon: Icons.emoji_events_rounded, index: 1, selected: selectedIndex == 1, onTap: onTap, color: const Color(0xFFD4A017)),
-              _NavItem(icon: Icons.play_circle_filled,  index: 2, selected: selectedIndex == 2, onTap: onTap, color: const Color(0xFF8B2BE2)),
-              _NavItem(icon: Icons.calculate_rounded,   index: 3, selected: selectedIndex == 3, onTap: onTap, color: const Color(0xFF4CAF50)),
-              _NavItem(icon: Icons.person_rounded,      index: 4, selected: selectedIndex == 4, onTap: onTap, color: Colors.white70),
+              _NavItem(icon: Icons.play_circle_filled, index: 2, selected: selectedIndex == 2, onTap: onTap, color: const Color(0xFF8B2BE2)),
+              _NavItem(icon: Icons.calculate_rounded, index: 3, selected: selectedIndex == 3, onTap: onTap, color: const Color(0xFF4CAF50)),
+              _NavItem(icon: Icons.person_rounded, index: 4, selected: selectedIndex == 4, onTap: onTap, color: Colors.white70),
             ],
           ),
         ),
@@ -600,7 +608,7 @@ class _NavItem extends StatelessWidget {
         padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 8),
         decoration: selected
             ? BoxDecoration(
-                color: color.withOpacity(0.12),
+                color: color.withValues(alpha: 0.12),
                 borderRadius: BorderRadius.circular(12),
               )
             : null,
