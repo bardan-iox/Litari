@@ -1,8 +1,14 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import '../theme/app_theme.dart';
+<<<<<<< HEAD
 import '../services/user_service.dart';
 import '../widgets/litari_bottom_nav_bar.dart';
+=======
+import '../widgets/litari_logo.dart';
+import '../widgets/litari_bottom_nav_bar.dart';
+import 'pilih_bahasa_screen.dart';
+>>>>>>> a7c0bc1 (tambah nav bawah di beberapa halaman,login cuma lewat google)
 import 'materi_screen.dart';
 import 'profil_screen.dart';
 import 'video_screen.dart';

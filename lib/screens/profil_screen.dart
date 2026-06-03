@@ -1,5 +1,6 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
+import 'package:litari/screens/login_screen.dart';
 import 'package:litari/widgets/litari_bottom_nav_bar.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import '../services/user_service.dart';
@@ -53,10 +54,13 @@ class ProfilScreen extends StatelessWidget {
     ),
   );
 
-    if (confirm == true) {
-      await UserService.logout();
-      // Tidak perlu navigasi manual — StreamBuilder di main.dart
-      // otomatis redirect ke SplashScreen saat auth state berubah ke null
+  if (confirm == true) {
+    await UserService.logout();
+    if (context.mounted) {
+      Navigator.of(context).pushAndRemoveUntil(
+        MaterialPageRoute(builder: (_) => const LoginScreen()),
+        (route) => false,
+      );
     }
   }
 
