@@ -66,6 +66,7 @@ class ProfilScreen extends StatelessWidget {
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
+                  _buildTopBar(context),
                   _buildProfileHeader(context, data),
                   const SizedBox(height: 20),
                   _buildDaftarTeman(data),
@@ -84,6 +85,28 @@ class ProfilScreen extends StatelessWidget {
           ),
         );
       },
+    );
+  }
+
+  Widget _buildTopBar(BuildContext context) {
+    return Padding(
+      padding: const EdgeInsets.fromLTRB(4, 8, 16, 0),
+      child: Row(
+        children: [
+          IconButton(
+            icon: const Icon(Icons.arrow_back_ios_new, color: Colors.white),
+            onPressed: () => Navigator.of(context).pop(),
+          ),
+          const Text(
+            'Profil',
+            style: TextStyle(
+              color: Colors.white,
+              fontSize: 18,
+              fontWeight: FontWeight.w800,
+            ),
+          ),
+        ],
+      ),
     );
   }
 
