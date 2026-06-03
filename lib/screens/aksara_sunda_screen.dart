@@ -31,12 +31,12 @@ const List<_AksaraItem> _konsonan = [
   _AksaraItem('ᮞ', 'sa'),
   _AksaraItem('ᮠ', 'ha'),
   _AksaraItem('ᮖ', 'fa'),
-  _AksaraItem('ᮟ', 'qa'),
+  _AksaraItem('ᮋ', 'qa'),
   _AksaraItem('ᮗ', 'va'),
-  _AksaraItem('ᮜ᮪ᮞ', 'xa'),
+  _AksaraItem('ᮟ', 'xa'),
   _AksaraItem('ᮐ', 'za'),
-  _AksaraItem('ᮊᮠ', 'kha'),
-  _AksaraItem('ᮞᮚ', 'sya'),
+  _AksaraItem('ᮮ', 'kha'),
+  _AksaraItem('ᮯ', 'sya'),
 ];
 
 const List<_AksaraItem> _vokal = [
