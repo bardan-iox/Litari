@@ -256,7 +256,9 @@ class UserService {
   // ════════════════════════════════════════════════════
 
   static Future<void> logout() async {
-    await GoogleSignIn().signOut();
+    try {
+      await GoogleSignIn().signOut();
+    } catch (_) {}
     await _auth.signOut();
   }
 }

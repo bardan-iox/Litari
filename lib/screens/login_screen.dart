@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
-import 'package:google_sign_in/google_sign_in.dart';
 import '../theme/app_theme.dart';
 import '../widgets/litari_logo.dart';
 import '../services/user_service.dart';
@@ -86,17 +85,8 @@ class _LoginScreenState extends State<LoginScreen> {
       googleProvider.addScope('email');
       googleProvider.addScope('profile');
 
-      final googleUser = await GoogleSignIn().signIn();
-      if (googleUser == null) {
-        setState(() => _isLoading = false);
-        return;
-      }
-      final googleAuth = await googleUser.authentication;
-      final credential = GoogleAuthProvider.credential(
-        accessToken: googleAuth.accessToken,
-        idToken: googleAuth.idToken,
-      );
-      final cred = await FirebaseAuth.instance.signInWithCredential(credential);
+      final cred =
+          await FirebaseAuth.instance.signInWithPopup(googleProvider);
       await UserService.initUser(cred.user!);
       if (mounted) {
         Navigator.of(context).pushAndRemoveUntil(
@@ -311,22 +301,26 @@ class _SocialLoginRow extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return _SocialButton(
-      onPressed: onGooglePressed,
-      child: Row(
-        mainAxisAlignment: MainAxisAlignment.center,
-        children: [
-          SvgPicture.asset('assets/Google_logo.svg', width: 28, height: 28),
-          const SizedBox(width: 10),
-          const Text(
-            'Masuk dengan Google',
-            style: TextStyle(
-              color: AppColors.textPrimary,
-              fontSize: 16,
-              fontWeight: FontWeight.w600,
+    return SizedBox(
+      width: double.infinity,
+      child: _SocialButton(
+        onPressed: onGooglePressed,
+        child: Row(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            SvgPicture.asset('assets/Google_logo.svg',
+                width: 28, height: 28),
+            const SizedBox(width: 8),
+            const Text(
+              'Google',
+              style: TextStyle(
+                color: AppColors.textPrimary,
+                fontSize: 18,
+                fontWeight: FontWeight.w500,
+              ),
             ),
-          ),
-        ],
+          ],
+        ),
       ),
     );
   }
@@ -341,7 +335,6 @@ class _SocialButton extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return SizedBox(
-      width: double.infinity,
       height: 56,
       child: ElevatedButton(
         onPressed: onPressed,

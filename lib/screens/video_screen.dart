@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:youtube_player_iframe/youtube_player_iframe.dart';
 import '../theme/app_theme.dart';
+import '../widgets/litari_bottom_nav_bar.dart';
 
 // ════════════════════════════════════════════════════════════════
 //  DATA VIDEO
@@ -107,6 +108,7 @@ class _VideoScreenState extends State<VideoScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: AppColors.background,
+      bottomNavigationBar: const LitariBottomNavBar(selectedIndex: 2),
       body: SafeArea(
         child: Column(
           children: [
