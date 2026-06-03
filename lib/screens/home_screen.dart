@@ -16,7 +16,6 @@ class HomeScreen extends StatefulWidget {
 }
 
 class _HomeScreenState extends State<HomeScreen> {
-  int _selectedNavIndex = 0;
 
   static const List<_BahasaCard> _bahasaList = [
     _BahasaCard(
@@ -92,26 +91,7 @@ class _HomeScreenState extends State<HomeScreen> {
           ],
         ),
       ),
-      bottomNavigationBar: LitariBottomNavBar(
-        currentIndex: _selectedNavIndex,
-        onTap: (i) {
-          if (i == 2) {
-            Navigator.of(context).push(
-              MaterialPageRoute(builder: (_) => const VideoScreen()),
-            );
-          } else if (i == 3) {
-            Navigator.of(context).push(
-              MaterialPageRoute(builder: (_) => const AksaraSundaScreen()),
-            );
-          } else if (i == 4) {
-            Navigator.of(context).push(
-              MaterialPageRoute(builder: (_) => const ProfilScreen()),
-            );
-          } else {
-            setState(() => _selectedNavIndex = i);
-          }
-        },
-      ),
+      bottomNavigationBar: const LitariBottomNavBar(selectedIndex: 0),
     );
   }
 
@@ -129,11 +109,10 @@ class _HomeScreenState extends State<HomeScreen> {
       ),
       child: Row(
         children: [
-          // ← replaced CustomPaint(_MiniMascotPainter) with LitariLogo
-          const SizedBox(
+          SizedBox(
             width: 40,
             height: 40,
-            child: LitariLogo(showName: false, size : 40),
+            child: CustomPaint(painter: _MiniMascotPainter()),
           ),
           const SizedBox(width: 10),
           const Text(
@@ -292,26 +271,6 @@ class _HomeScreenState extends State<HomeScreen> {
           children: [
             Row(
               children: [
-                // Image version of the "continue learning" banner
-                ClipRRect(
-                  borderRadius: BorderRadius.circular(10),
-                  child: Image.asset(
-                    'assets/images/sunda.png',
-                    width: 48,
-                    height: 48,
-                    fit: BoxFit.cover,
-                    errorBuilder: (_, error, ___) {
-                      debugPrint('Image load error: $error');
-                      return Container(
-                        color: card.warna,
-                        child: Center(
-                          child: Text(card.nama[0],
-                            style: const TextStyle(color: Colors.white, fontSize: 32)),
-                        ),
-                      );
-                    },
-                  ),
-                ),
                 const SizedBox(width: 12),
                 Expanded(
                   child: Column(
@@ -515,78 +474,150 @@ class _BahasaCardWidget extends StatelessWidget {
           ),
           borderRadius: BorderRadius.circular(16),
         ),
-        child: ClipRRect(
-          borderRadius: BorderRadius.circular(16),
-          child: Stack(
-            fit: StackFit.expand,
-            children: [
-              // Background image, faded into the gradient
-              Positioned.fill(
-                child: Image.asset(
-                  card.imagePath,
-                  fit: BoxFit.cover,
-                  alignment: Alignment.topCenter,
-                  errorBuilder: (_, __, ___) => const SizedBox.shrink(),
+        padding: const EdgeInsets.all(14),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Image.asset(
+              card.imagePath,
+              width: 48,
+              height: 48,
+              fit: BoxFit.cover,
+            ),
+            const Spacer(),
+            Text(
+              card.nama,
+              style: const TextStyle(
+                color: Colors.white,
+                fontSize: 14,
+                fontWeight: FontWeight.w800,
+              ),
+            ),
+            const SizedBox(height: 6),
+            if (card.progress > 0) ...[
+              ClipRRect(
+                borderRadius: BorderRadius.circular(4),
+                child: LinearProgressIndicator(
+                  value: card.progress,
+                  minHeight: 5,
+                  backgroundColor: Colors.white.withOpacity(0.25),
+                  valueColor: const AlwaysStoppedAnimation<Color>(Colors.white),
                 ),
               ),
-              // Dark overlay so text stays readable
-              Positioned.fill(
-                child: Container(
-                  decoration: BoxDecoration(
-                    gradient: LinearGradient(
-                      colors: [
-                        Colors.transparent,
-                        card.warna.withOpacity(0.85),
-                      ],
-                      begin: Alignment.topCenter,
-                      end: Alignment.bottomCenter,
-                    ),
-                  ),
-                ),
-              ),
-              // Text content pinned to the bottom
-              Positioned(
-                left: 12,
-                right: 12,
-                bottom: 12,
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  mainAxisSize: MainAxisSize.min,
-                  children: [
-                    Text(
-                      card.nama,
-                      style: const TextStyle(
-                        color: Colors.white,
-                        fontSize: 13,
-                        fontWeight: FontWeight.w800,
-                      ),
-                    ),
-                    const SizedBox(height: 6),
-                    if (card.progress > 0)
-                      ClipRRect(
-                        borderRadius: BorderRadius.circular(4),
-                        child: LinearProgressIndicator(
-                          value: card.progress,
-                          minHeight: 5,
-                          backgroundColor: Colors.white.withOpacity(0.25),
-                          valueColor: const AlwaysStoppedAnimation<Color>(
-                              Colors.white),
-                        ),
-                      )
-                    else
-                      Text(
-                        'Mulai belajar →',
-                        style: TextStyle(
-                          color: Colors.white.withOpacity(0.75),
-                          fontSize: 11,
-                          fontWeight: FontWeight.w600,
-                        ),
-                      ),
-                  ],
+            ] else ...[
+              Text(
+                'Mulai belajar →',
+                style: TextStyle(
+                  color: Colors.white.withOpacity(0.75),
+                  fontSize: 11,
+                  fontWeight: FontWeight.w600,
                 ),
               ),
             ],
+          ],
+        ),
+      ),
+    );
+  }
+}
+
+// ─── Mini mascot untuk header ──────────────────────────────────
+
+class _MiniMascotPainter extends CustomPainter {
+  @override
+  void paint(Canvas canvas, Size size) {
+    final cx = size.width / 2;
+    final cy = size.height / 2;
+    final p = Paint()..color = const Color(0xFFE07B3A);
+    canvas.drawCircle(Offset(cx, cy - 4), 14, p);
+    canvas.drawOval(Rect.fromCenter(center: Offset(cx, cy + 8), width: 24, height: 18), p);
+    final belly = Paint()..color = const Color(0xFFF5DEB3);
+    canvas.drawOval(Rect.fromCenter(center: Offset(cx, cy - 2), width: 16, height: 13), belly);
+    final eye = Paint()..color = const Color(0xFF3D1A00);
+    canvas.drawCircle(Offset(cx - 4, cy - 6), 2, eye);
+    canvas.drawCircle(Offset(cx + 4, cy - 6), 2, eye);
+    final cape = Paint()..color = const Color(0xFFC0392B);
+    final capePath = Path()
+      ..moveTo(cx - 12, cy + 2)
+      ..quadraticBezierTo(cx, cy + 22, cx + 12, cy + 2)
+      ..quadraticBezierTo(cx + 8, cy + 18, cx, cy + 24)
+      ..quadraticBezierTo(cx - 8, cy + 18, cx - 12, cy + 2)
+      ..close();
+    canvas.drawPath(capePath, cape);
+  }
+
+  @override
+  bool shouldRepaint(covariant CustomPainter old) => false;
+}
+
+// ─── Bottom Navigation Bar ─────────────────────────────────────
+
+class _BottomNavBar extends StatelessWidget {
+  final int selectedIndex;
+  final void Function(int) onTap;
+
+  const _BottomNavBar({required this.selectedIndex, required this.onTap});
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      decoration: BoxDecoration(
+        color: AppColors.background,
+        border: Border(top: BorderSide(color: AppColors.divider, width: 0.5)),
+      ),
+      child: SafeArea(
+        top: false,
+        child: SizedBox(
+          height: 64,
+          child: Row(
+            mainAxisAlignment: MainAxisAlignment.spaceAround,
+            children: [
+              _NavItem(icon: Icons.home_rounded,        index: 0, selected: selectedIndex == 0, onTap: onTap, color: const Color(0xFFE05252)),
+              _NavItem(icon: Icons.emoji_events_rounded, index: 1, selected: selectedIndex == 1, onTap: onTap, color: const Color(0xFFD4A017)),
+              _NavItem(icon: Icons.play_circle_filled,  index: 2, selected: selectedIndex == 2, onTap: onTap, color: const Color(0xFF8B2BE2)),
+              _NavItem(icon: Icons.abc_rounded,           index: 3, selected: selectedIndex == 3, onTap: onTap, color: const Color(0xFF4CAF50)),
+              _NavItem(icon: Icons.person_rounded,      index: 4, selected: selectedIndex == 4, onTap: onTap, color: Colors.white70),
+            ],
           ),
+        ),
+      ),
+    );
+  }
+}
+
+class _NavItem extends StatelessWidget {
+  final IconData icon;
+  final int index;
+  final bool selected;
+  final void Function(int) onTap;
+  final Color color;
+
+  const _NavItem({
+    required this.icon,
+    required this.index,
+    required this.selected,
+    required this.onTap,
+    required this.color,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return GestureDetector(
+      onTap: () => onTap(index),
+      behavior: HitTestBehavior.opaque,
+      child: AnimatedContainer(
+        duration: const Duration(milliseconds: 200),
+        padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 8),
+        decoration: selected
+            ? BoxDecoration(
+                color: color.withOpacity(0.12),
+                borderRadius: BorderRadius.circular(12),
+              )
+            : null,
+        child: Icon(
+          icon,
+          color: selected ? color : Colors.white38,
+          size: 28,
         ),
       ),
     );

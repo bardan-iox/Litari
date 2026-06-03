@@ -1,23 +1,54 @@
 import 'package:flutter/material.dart';
 import '../theme/app_theme.dart';
+import '../screens/home_screen.dart';
+import '../screens/video_screen.dart';
+import '../screens/aksara_sunda_screen.dart';
+import '../screens/profil_screen.dart';
+
+/// Index mapping:
+///  0 = Home
+///  1 = Leaderboard (placeholder)
+///  2 = Video
+///  3 = Aksara Sunda
+///  4 = Profil
 
 class LitariBottomNavBar extends StatelessWidget {
-  final int currentIndex;
-  final void Function(int) onTap;
+  final int selectedIndex;
 
-  const LitariBottomNavBar({
-    super.key,
-    required this.currentIndex,
-    required this.onTap,
-  });
+  const LitariBottomNavBar({super.key, required this.selectedIndex});
 
-  static const _items = [
-    _NavItemData(icon: Icons.home_rounded,         color: Color(0xFFE05252)),
-    _NavItemData(icon: Icons.emoji_events_rounded,  color: Color(0xFFD4A017)),
-    _NavItemData(icon: Icons.play_circle_filled,    color: Color(0xFF8B2BE2)),
-    _NavItemData(icon: Icons.calculate_rounded,     color: Color(0xFF4CAF50)),
-    _NavItemData(icon: Icons.person_rounded,        color: Colors.white70),
-  ];
+  void _onTap(BuildContext context, int i) {
+    if (i == selectedIndex) return;
+
+    switch (i) {
+      case 0:
+        Navigator.of(context).pushAndRemoveUntil(
+          MaterialPageRoute(builder: (_) => const HomeScreen()),
+          (route) => false,
+        );
+        break;
+      case 2:
+        Navigator.of(context).pushAndRemoveUntil(
+          MaterialPageRoute(builder: (_) => const VideoScreen()),
+          (route) => false,
+        );
+        break;
+      case 3:
+        Navigator.of(context).pushAndRemoveUntil(
+          MaterialPageRoute(builder: (_) => const AksaraSundaScreen()),
+          (route) => false,
+        );
+        break;
+      case 4:
+        Navigator.of(context).pushAndRemoveUntil(
+          MaterialPageRoute(builder: (_) => const ProfilScreen()),
+          (route) => false,
+        );
+        break;
+      default:
+        break;
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -34,30 +65,43 @@ class LitariBottomNavBar extends StatelessWidget {
           height: 64,
           child: Row(
             mainAxisAlignment: MainAxisAlignment.spaceAround,
-            children: List.generate(_items.length, (i) {
-              final item = _items[i];
-              final selected = i == currentIndex;
-              return GestureDetector(
-                onTap: () => onTap(i),
-                behavior: HitTestBehavior.opaque,
-                child: AnimatedContainer(
-                  duration: const Duration(milliseconds: 200),
-                  padding: const EdgeInsets.symmetric(
-                      horizontal: 14, vertical: 8),
-                  decoration: selected
-                      ? BoxDecoration(
-                          color: item.color.withOpacity(0.12),
-                          borderRadius: BorderRadius.circular(12),
-                        )
-                      : null,
-                  child: Icon(
-                    item.icon,
-                    color: selected ? item.color : Colors.white38,
-                    size: 28,
-                  ),
-                ),
-              );
-            }),
+            children: [
+              _NavItem(
+                icon: Icons.home_rounded,
+                index: 0,
+                selected: selectedIndex == 0,
+                onTap: (i) => _onTap(context, i),
+                color: const Color(0xFFE05252),
+              ),
+              _NavItem(
+                icon: Icons.emoji_events_rounded,
+                index: 1,
+                selected: selectedIndex == 1,
+                onTap: (i) => _onTap(context, i),
+                color: const Color(0xFFD4A017),
+              ),
+              _NavItem(
+                icon: Icons.play_circle_filled,
+                index: 2,
+                selected: selectedIndex == 2,
+                onTap: (i) => _onTap(context, i),
+                color: const Color(0xFF8B2BE2),
+              ),
+              _NavItem(
+                icon: Icons.abc_rounded,
+                index: 3,
+                selected: selectedIndex == 3,
+                onTap: (i) => _onTap(context, i),
+                color: const Color(0xFF4CAF50),
+              ),
+              _NavItem(
+                icon: Icons.person_rounded,
+                index: 4,
+                selected: selectedIndex == 4,
+                onTap: (i) => _onTap(context, i),
+                color: Colors.white70,
+              ),
+            ],
           ),
         ),
       ),
@@ -65,8 +109,41 @@ class LitariBottomNavBar extends StatelessWidget {
   }
 }
 
-class _NavItemData {
+class _NavItem extends StatelessWidget {
   final IconData icon;
+  final int index;
+  final bool selected;
+  final void Function(int) onTap;
   final Color color;
-  const _NavItemData({required this.icon, required this.color});
+
+  const _NavItem({
+    required this.icon,
+    required this.index,
+    required this.selected,
+    required this.onTap,
+    required this.color,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return GestureDetector(
+      onTap: () => onTap(index),
+      behavior: HitTestBehavior.opaque,
+      child: AnimatedContainer(
+        duration: const Duration(milliseconds: 200),
+        padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 8),
+        decoration: selected
+            ? BoxDecoration(
+                color: color.withOpacity(0.12),
+                borderRadius: BorderRadius.circular(12),
+              )
+            : null,
+        child: Icon(
+          icon,
+          color: selected ? color : Colors.white38,
+          size: 28,
+        ),
+      ),
+    );
+  }
 }

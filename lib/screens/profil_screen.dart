@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:litari/widgets/litari_bottom_nav_bar.dart';
 import '../services/user_service.dart';
 import '../theme/app_theme.dart';
+import '../widgets/litari_bottom_nav_bar.dart';
 import 'splash_screen.dart';
 import 'home_screen.dart';
 import 'video_screen.dart';
@@ -65,34 +66,13 @@ class ProfilScreen extends StatelessWidget {
 
         return Scaffold(
           backgroundColor: AppColors.background,
-          bottomNavigationBar: LitariBottomNavBar(
-            currentIndex: 4,
-            onTap: (i) {
-              if (i == 0) {
-                Navigator.of(context).pushAndRemoveUntil(
-                  MaterialPageRoute(builder: (_) => const HomeScreen()),
-                  (route) => false,
-                );
-              } else if (i == 2) {
-                Navigator.of(context).push(
-                  MaterialPageRoute(builder: (_) => const VideoScreen()),
-                );
-              } else if (i == 3) {
-                Navigator.of(context).push(
-                  MaterialPageRoute(builder: (_) => const AksaraSundaScreen()),
-                );
-              } else if (i == 4) {
-                // Sudah di profil, tidak perlu navigasi
-              }
-            },
-          ),
+          bottomNavigationBar: const LitariBottomNavBar(selectedIndex: 4),
           body: SafeArea(
             child: SingleChildScrollView(
               physics: const BouncingScrollPhysics(),
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  _buildTopBar(context),
                   _buildProfileHeader(context, data),
                   const SizedBox(height: 20),
                   _buildDaftarTeman(data),
@@ -111,28 +91,6 @@ class ProfilScreen extends StatelessWidget {
           ),
         );
       },
-    );
-  }
-
-  Widget _buildTopBar(BuildContext context) {
-    return Padding(
-      padding: const EdgeInsets.fromLTRB(4, 8, 16, 0),
-      child: Row(
-        children: [
-          IconButton(
-            icon: const Icon(Icons.arrow_back_ios_new, color: Colors.white),
-            onPressed: () => Navigator.of(context).pop(),
-          ),
-          const Text(
-            'Profil',
-            style: TextStyle(
-              color: Colors.white,
-              fontSize: 18,
-              fontWeight: FontWeight.w800,
-            ),
-          ),
-        ],
-      ),
     );
   }
 
