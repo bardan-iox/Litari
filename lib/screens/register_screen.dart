@@ -1,9 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
-import 'package:google_sign_in/google_sign_in.dart';
 import '../theme/app_theme.dart';
 import '../widgets/litari_logo.dart';
 import '../services/user_service.dart';
+import 'home_screen.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 
 class RegisterScreen extends StatefulWidget {
@@ -54,6 +54,12 @@ class _RegisterScreenState extends State<RegisterScreen> {
       );
       await cred.user?.updateDisplayName(_usernameController.text.trim());
       await UserService.initUser(cred.user!);
+      if (mounted) {
+        Navigator.of(context).pushAndRemoveUntil(
+          MaterialPageRoute(builder: (_) => const HomeScreen()),
+          (route) => false,
+        );
+      }
     } on FirebaseAuthException catch (e) {
       setState(() {
         switch (e.code) {
@@ -67,9 +73,11 @@ class _RegisterScreenState extends State<RegisterScreen> {
             _errorMessage = 'Kata sandi terlalu lemah';
             break;
           default:
-            _errorMessage = 'Registrasi gagal, coba lagi';
+            _errorMessage = e.message ?? 'Registrasi gagal, coba lagi';
         }
       });
+    } catch (e) {
+      setState(() => _errorMessage = e.toString());
     } finally {
       if (mounted) setState(() => _isLoading = false);
     }
@@ -82,22 +90,21 @@ class _RegisterScreenState extends State<RegisterScreen> {
     });
 
     try {
-      final GoogleSignInAccount? googleUser = await GoogleSignIn().signIn();
-      if (googleUser == null) {
-        setState(() => _isLoading = false);
-        return;
-      }
-      final GoogleSignInAuthentication googleAuth =
-          await googleUser.authentication;
-      final credential = GoogleAuthProvider.credential(
-        accessToken: googleAuth.accessToken,
-        idToken: googleAuth.idToken,
-      );
+      GoogleAuthProvider googleProvider = GoogleAuthProvider();
+      googleProvider.addScope('email');
+      googleProvider.addScope('profile');
+
       final cred =
-          await FirebaseAuth.instance.signInWithCredential(credential);
+          await FirebaseAuth.instance.signInWithPopup(googleProvider);
       await UserService.initUser(cred.user!);
+      if (mounted) {
+        Navigator.of(context).pushAndRemoveUntil(
+          MaterialPageRoute(builder: (_) => const HomeScreen()),
+          (route) => false,
+        );
+      }
     } catch (e) {
-      setState(() => _errorMessage = 'Daftar dengan Google gagal, coba lagi');
+      setState(() => _errorMessage = 'Daftar Google gagal: $e');
     } finally {
       if (mounted) setState(() => _isLoading = false);
     }

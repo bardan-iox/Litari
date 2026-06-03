@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import '../theme/app_theme.dart';
 import '../widgets/litari_logo.dart';
 import 'login_screen.dart';
-import 'register_screen.dart'; // ← tambahkan import
+import 'register_screen.dart';
 
 class SplashScreen extends StatelessWidget {
   const SplashScreen({super.key});
@@ -25,7 +25,7 @@ class SplashScreen extends StatelessWidget {
               _PrimaryButton(
                 label: 'Login',
                 onPressed: () {
-                  Navigator.of(context).push(
+                  Navigator.of(context).pushReplacement(
                     MaterialPageRoute(
                       builder: (_) => const LoginScreen(),
                     ),
@@ -38,7 +38,7 @@ class SplashScreen extends StatelessWidget {
               _SecondaryButton(
                 label: 'Register',
                 onPressed: () {
-                  Navigator.of(context).push(
+                  Navigator.of(context).pushReplacement(
                     MaterialPageRoute(
                       builder: (_) => const RegisterScreen(),
                     ),
