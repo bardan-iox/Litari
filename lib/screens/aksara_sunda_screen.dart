@@ -42,11 +42,12 @@ const List<_AksaraItem> _konsonan = [
 
 const List<_AksaraItem> _vokal = [
   _AksaraItem('ᮄ', 'a'),
-  _AksaraItem('ᮄᮤ', 'i'),
-  _AksaraItem('ᮄᮥ', 'u'),
+  _AksaraItem('ᮄ', 'i'),
+  _AksaraItem('ᮄ', 'u'),
   _AksaraItem('ᮆ', 'e'),
   _AksaraItem('ᮇ', 'o'),
   _AksaraItem('ᮈ', 'eu'),
+  _AksaraItem('ᮆ', 'é'),
 ];
 
 // ════════════════════════════════════════════════════════════════
@@ -221,6 +222,7 @@ class _AksaraCard extends StatelessWidget {
             item.aksara,
             style: const TextStyle(
               color: Colors.white,
+              fontFamily: 'aksara_sunda',
               fontSize: 22,
               height: 1.1,
             ),
