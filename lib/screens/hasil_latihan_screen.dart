@@ -158,23 +158,23 @@ class HasilLatihanScreen extends StatelessWidget {
 
   Widget _buildBottomNav() {
     return Container(
-      decoration: BoxDecoration(
+      decoration: const BoxDecoration(
         color: AppColors.background,
         border: Border(
           top: BorderSide(color: AppColors.divider, width: 0.5),
         ),
       ),
-      child: SafeArea(
+      child: const SafeArea(
         top: false,
         child: SizedBox(
           height: 64,
           child: Row(
             mainAxisAlignment: MainAxisAlignment.spaceAround,
             children: [
-              _NavIcon(icon: Icons.home_rounded, color: const Color(0xFFE05252)),
-              _NavIcon(icon: Icons.emoji_events_rounded, color: const Color(0xFFD4A017)),
-              _NavIcon(icon: Icons.play_circle_filled, color: const Color(0xFF8B2BE2)),
-              _NavIcon(icon: Icons.calculate_rounded, color: const Color(0xFF4CAF50)),
+              _NavIcon(icon: Icons.home_rounded, color: Color(0xFFE05252)),
+              _NavIcon(icon: Icons.emoji_events_rounded, color: Color(0xFFD4A017)),
+              _NavIcon(icon: Icons.play_circle_filled, color: Color(0xFF8B2BE2)),
+              _NavIcon(icon: Icons.calculate_rounded, color: Color(0xFF4CAF50)),
               _NavIcon(icon: Icons.person_rounded, color: Colors.white70),
             ],
           ),
@@ -218,7 +218,7 @@ class _StatCard extends StatelessWidget {
           Text(
             label,
             style: TextStyle(
-              color: textColor.withOpacity(0.7),
+              color: textColor.withValues(alpha: 0.7),
               fontSize: 13,
               fontWeight: FontWeight.w600,
             ),
@@ -262,7 +262,7 @@ class _NavIcon extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Icon(icon, color: color.withOpacity(0.4), size: 28);
+    return Icon(icon, color: color.withValues(alpha: 0.4), size: 28);
   }
 }
 

@@ -27,7 +27,7 @@ class ProfilScreen extends StatelessWidget {
       actions: [
         TextButton(
           onPressed: () => Navigator.pop(ctx, false),
-          child: Text('Batal', style: TextStyle(color: AppColors.primary)),
+          child: const Text('Batal', style: TextStyle(color: AppColors.primary)),
         ),
         ElevatedButton(
           onPressed: () => Navigator.pop(ctx, true),
@@ -151,14 +151,14 @@ Widget _buildProfileHeader(
             padding:
                 const EdgeInsets.symmetric(horizontal: 12, vertical: 4),
             decoration: BoxDecoration(
-              color: AppColors.primary.withOpacity(0.15),
+              color: AppColors.primary.withValues(alpha: 0.15),
               borderRadius: BorderRadius.circular(20),
               border:
-                  Border.all(color: AppColors.primary.withOpacity(0.4)),
+                  Border.all(color: AppColors.primary.withValues(alpha: 0.4)),
             ),
             child: Text(
               '$xp XP',
-              style: TextStyle(
+              style: const TextStyle(
                 color: AppColors.primary,
                 fontSize: 13,
                 fontWeight: FontWeight.w700,
@@ -256,10 +256,10 @@ Widget _buildProfileHeader(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         // HEADLINE
-        Row(
+        const Row(
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: [
-            const Text(
+            Text(
               'Daftar Teman',
               style: TextStyle(
                 color: Colors.white,
@@ -270,7 +270,7 @@ Widget _buildProfileHeader(
             Text(
               'Lihat Daftar',
               style: TextStyle(
-                color: const Color(0xFFE07A5F), 
+                color: Color(0xFFE07A5F), 
                 fontSize: 14,
                 fontWeight: FontWeight.w600,
               ),
@@ -475,7 +475,7 @@ void _tambahTemanFirebase(String targetUid) async {
               ),
               Text(
                 '${lencana.length} diraih',
-                style: TextStyle(
+                style: const TextStyle(
                   color: AppColors.primary,
                   fontSize: 14,
                   fontWeight: FontWeight.w600,
@@ -646,7 +646,7 @@ class _TemanCardRemote extends StatelessWidget {
           Container(
             width: 56, 
             height: 56,
-            decoration: BoxDecoration(
+            decoration: const BoxDecoration(
               shape: BoxShape.circle,
               color: AppColors.surfaceVariant,
             ),
@@ -731,7 +731,7 @@ class _LencanaItem extends StatelessWidget {
           decoration: BoxDecoration(
             shape: BoxShape.circle,
             color: earned
-                ? color.withOpacity(0.15)
+                ? color.withValues(alpha: 0.15)
                 : Colors.white10,
             border: Border.all(
               color: earned ? color : Colors.white24,
@@ -776,9 +776,9 @@ class _PencapaianCard extends StatelessWidget {
     return Container(
       padding: const EdgeInsets.symmetric(vertical: 16),
       decoration: BoxDecoration(
-        color: color.withOpacity(0.08),
+        color: color.withValues(alpha: 0.08),
         borderRadius: BorderRadius.circular(14),
-        border: Border.all(color: color.withOpacity(0.3), width: 1.5),
+        border: Border.all(color: color.withValues(alpha: 0.3), width: 1.5),
       ),
       child: Column(
         children: [

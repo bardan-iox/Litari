@@ -183,7 +183,7 @@ List<Soal> _buatDaftarSoal(Random rand) {
   final semuaPasangan = List<PasanganKata>.from(_bankPasangan)..shuffle(rand);
 
   // Jika bank tidak cukup untuk 6×4 tanpa pengulangan, putar ulang.
-  final diperlukan = _soalPasangan * _pasanganPerSoal;
+  const diperlukan = _soalPasangan * _pasanganPerSoal;
   while (semuaPasangan.length < diperlukan) {
     final tambahan = List<PasanganKata>.from(_bankPasangan)..shuffle(rand);
     semuaPasangan.addAll(tambahan);
@@ -1015,7 +1015,7 @@ class HasilScreen extends StatelessWidget {
                         // Ulangi latihan dengan soal baru
                         Navigator.of(context).pushReplacement(
                           MaterialPageRoute(
-                            builder: (_) => LatihanScreen(
+                            builder: (_) => const LatihanScreen(
                               bahasaKey: 'sunda',
                             ),
                           ),
@@ -1146,13 +1146,13 @@ class _BottomNavSimple extends StatelessWidget {
   Widget build(BuildContext context) {
     return Container(
       height: 64,
-      decoration: BoxDecoration(
+      decoration: const BoxDecoration(
         color: AppColors.background,
         border: Border(top: BorderSide(color: AppColors.divider, width: 0.5)),
       ),
-      child: Row(
+      child: const Row(
         mainAxisAlignment: MainAxisAlignment.spaceAround,
-        children: const [
+        children: [
           Icon(Icons.home,              color: Color(0xFFE05252), size: 28),
           Icon(Icons.emoji_events,      color: Color(0xFFD4A017), size: 28),
           Icon(Icons.play_circle_fill,  color: Color(0xFF8B2BE2), size: 28),

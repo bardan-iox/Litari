@@ -344,7 +344,7 @@ class _BottomNavBar extends StatelessWidget {
         top: false,
         child: Container(
           height: 64,
-          decoration: BoxDecoration(
+          decoration: const BoxDecoration(
             color: AppColors.background,
             border: Border(
               top: BorderSide(color: AppColors.divider, width: 0.5),

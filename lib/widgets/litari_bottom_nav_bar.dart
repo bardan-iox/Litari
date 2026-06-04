@@ -53,7 +53,7 @@ class LitariBottomNavBar extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Container(
-      decoration: BoxDecoration(
+      decoration: const BoxDecoration(
         color: AppColors.background,
         border: Border(
           top: BorderSide(color: AppColors.divider, width: 0.5),
@@ -134,7 +134,7 @@ class _NavItem extends StatelessWidget {
         padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 8),
         decoration: selected
             ? BoxDecoration(
-                color: color.withOpacity(0.12),
+                color: Colors.white.withValues(alpha: 0.12),
                 borderRadius: BorderRadius.circular(12),
               )
             : null,

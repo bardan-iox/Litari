@@ -230,7 +230,7 @@ class _RegisterCard extends StatelessWidget {
               ),
             ),
           ),
-          Divider(height: 1, thickness: 1, color: AppColors.inputBorder),
+          const Divider(height: 1, thickness: 1, color: AppColors.inputBorder),
           Padding(
             padding: const EdgeInsets.symmetric(horizontal: 16.0),
             child: TextField(
@@ -246,7 +246,7 @@ class _RegisterCard extends StatelessWidget {
               ),
             ),
           ),
-          Divider(height: 1, thickness: 1, color: AppColors.inputBorder),
+          const Divider(height: 1, thickness: 1, color: AppColors.inputBorder),
           Padding(
             padding: const EdgeInsets.symmetric(horizontal: 16.0),
             child: TextField(

@@ -99,7 +99,7 @@ class _HomeScreenState extends State<HomeScreen> {
         color: AppColors.background,
         border: Border(
           bottom: BorderSide(
-              color: AppColors.divider.withOpacity(0.4), width: 0.5),
+              color: AppColors.divider.withValues(alpha: 0.4), width: 0.5),
         ),
       ),
       child: Row(
@@ -127,7 +127,7 @@ class _HomeScreenState extends State<HomeScreen> {
               color: const Color(0xFF2C3347),
               borderRadius: BorderRadius.circular(20),
               border: Border.all(
-                  color: const Color(0xFFFFD700).withOpacity(0.4),
+                  color: const Color(0xFFFFD700).withValues(alpha: 0.4),
                   width: 1),
             ),
             child: const Row(
@@ -172,7 +172,7 @@ class _HomeScreenState extends State<HomeScreen> {
         ),
         borderRadius: BorderRadius.circular(16),
         border:
-            Border.all(color: AppColors.primary.withOpacity(0.5), width: 1),
+            Border.all(color: AppColors.primary.withValues(alpha: 0.5), width: 1),
       ),
       child: Row(
         children: [
@@ -180,7 +180,7 @@ class _HomeScreenState extends State<HomeScreen> {
             width: 52,
             height: 52,
             decoration: BoxDecoration(
-              color: AppColors.primary.withOpacity(0.2),
+              color: AppColors.primary.withValues(alpha: 0.2),
               borderRadius: BorderRadius.circular(14),
             ),
             child: const Center(
@@ -204,7 +204,7 @@ class _HomeScreenState extends State<HomeScreen> {
                 Text(
                   'Terus semangat! Belajar hari ini',
                   style: TextStyle(
-                    color: Colors.white.withOpacity(0.6),
+                    color: Colors.white.withValues(alpha: 0.6),
                     fontSize: 13,
                   ),
                 ),
@@ -284,7 +284,7 @@ class _HomeScreenState extends State<HomeScreen> {
                       Text(
                         'Materi 1 • 35% selesai',
                         style: TextStyle(
-                          color: Colors.white.withOpacity(0.75),
+                          color: Colors.white.withValues(alpha: 0.75),
                           fontSize: 13,
                         ),
                       ),
@@ -294,7 +294,7 @@ class _HomeScreenState extends State<HomeScreen> {
                 Container(
                   padding: const EdgeInsets.all(8),
                   decoration: BoxDecoration(
-                    color: Colors.white.withOpacity(0.2),
+                    color: Colors.white.withValues(alpha: 0.2),
                     borderRadius: BorderRadius.circular(10),
                   ),
                   child: const Icon(Icons.play_arrow_rounded,
@@ -308,7 +308,7 @@ class _HomeScreenState extends State<HomeScreen> {
               child: LinearProgressIndicator(
                 value: 0.35,
                 minHeight: 8,
-                backgroundColor: Colors.white.withOpacity(0.25),
+                backgroundColor: Colors.white.withValues(alpha: 0.25),
                 valueColor:
                     const AlwaysStoppedAnimation<Color>(Colors.white),
               ),
@@ -369,7 +369,7 @@ class _HomeScreenState extends State<HomeScreen> {
                 padding:
                     const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
                 decoration: BoxDecoration(
-                  color: const Color(0xFF2A8AAA).withOpacity(0.2),
+                  color: const Color(0xFF2A8AAA).withValues(alpha: 0.2),
                   borderRadius: BorderRadius.circular(8),
                 ),
                 child: const Text(
@@ -387,7 +387,7 @@ class _HomeScreenState extends State<HomeScreen> {
           Text(
             'Selesaikan 5 latihan hari ini untuk menjaga streakmu!',
             style: TextStyle(
-              color: Colors.white.withOpacity(0.6),
+              color: Colors.white.withValues(alpha: 0.6),
               fontSize: 13,
             ),
           ),
@@ -495,7 +495,7 @@ class _BahasaCardWidget extends StatelessWidget {
                 child: LinearProgressIndicator(
                   value: card.progress,
                   minHeight: 5,
-                  backgroundColor: Colors.white.withOpacity(0.25),
+                  backgroundColor: Colors.white.withValues(alpha: 0.25),
                   valueColor: const AlwaysStoppedAnimation<Color>(Colors.white),
                 ),
               ),
@@ -503,7 +503,7 @@ class _BahasaCardWidget extends StatelessWidget {
               Text(
                 'Mulai belajar →',
                 style: TextStyle(
-                  color: Colors.white.withOpacity(0.75),
+                  color: Colors.white.withValues(alpha: 0.75),
                   fontSize: 11,
                   fontWeight: FontWeight.w600,
                 ),
