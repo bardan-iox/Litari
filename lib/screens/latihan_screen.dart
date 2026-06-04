@@ -3,7 +3,6 @@ import 'dart:math';
 import 'package:flutter/material.dart';
 import '../theme/app_theme.dart';
 import '../services/user_service.dart';
-import '../widgets/litari_logo.dart';
 import 'home_screen.dart';
 
 // ════════════════════════════════════════════════════════════════
@@ -102,7 +101,8 @@ const List<AksaraSoal> _bankAksara = [
   AksaraSoal(latin: 'wa',  aksaraBenar: 'ᮝ', distraktor: ['ᮜ', 'ᮞ', 'ᮚ']),
   AksaraSoal(latin: 'sa',  aksaraBenar: 'ᮞ', distraktor: ['ᮟ', 'ᮛ', 'ᮠ']),
   AksaraSoal(latin: 'ha',  aksaraBenar: 'ᮠ', distraktor: ['ᮞ', 'ᮟ', 'ᮊ']),
-  AksaraSoal(latin: 'a',   aksaraBenar: 'ᮄ', distraktor: ['ᮆ', 'ᮇ', 'ᮈ']),
+  AksaraSoal(latin: 'a',   aksaraBenar: 'ᮃ', distraktor: ['ᮆ', 'ᮇ', 'ᮈ']),
+  AksaraSoal(latin: 'i',   aksaraBenar: 'ᮄ', distraktor: ['ᮆ', 'ᮇ', 'ᮈ']),
   AksaraSoal(latin: 'e',   aksaraBenar: 'ᮆ', distraktor: ['ᮄ', 'ᮇ', 'ᮈ']),
   AksaraSoal(latin: 'o',   aksaraBenar: 'ᮇ', distraktor: ['ᮆ', 'ᮄ', 'ᮈ']),
   AksaraSoal(latin: 'eu',  aksaraBenar: 'ᮈ', distraktor: ['ᮇ', 'ᮄ', 'ᮆ']),
@@ -146,10 +146,10 @@ class Soal {
 // ════════════════════════════════════════════════════════════════
 
 /// Jumlah soal per sesi latihan.
-const int _jumlahSoal = 12;
+const int _jumlahSoal = 10;
 const int _soalPasangan = 3;
-const int _soalGambar   = 4;
-const int _soalAksara   = 5;
+const int _soalGambar   = 3;
+const int _soalAksara   = 4;
 
 /// Jumlah pasangan per soal PilihPasangan.
 const int _pasanganPerSoal = 4;
@@ -407,7 +407,7 @@ class _HasilScreenState extends State<_HasilScreen> {
             behavior:         SnackBarBehavior.floating,
             shape: RoundedRectangleBorder(
               borderRadius: BorderRadius.circular(12),
-              side: BorderSide(color: AppColors.primary.withOpacity(0.5)),
+              side: BorderSide(color: AppColors.primary.withValues(alpha: 0.5)),
             ),
             content: Row(
               children: [
@@ -513,10 +513,10 @@ class _HasilScreenState extends State<_HasilScreen> {
                   padding: const EdgeInsets.symmetric(
                       horizontal: 20, vertical: 8),
                   decoration: BoxDecoration(
-                    color:        AppColors.primary.withOpacity(0.15),
+                    color:        AppColors.primary.withValues(alpha: 0.15),
                     borderRadius: BorderRadius.circular(20),
                     border: Border.all(
-                        color: AppColors.primary.withOpacity(0.4)),
+                        color: AppColors.primary.withValues(alpha: 0.4)),
                   ),
                   child: Text(
                     '+${_hasil!.xpDidapat} XP',

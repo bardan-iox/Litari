@@ -53,14 +53,14 @@ class ProfilScreen extends StatelessWidget {
       ],
     ),
   );
-
-  if (confirm == true) {
-    await UserService.logout();
-    if (context.mounted) {
-      Navigator.of(context).pushAndRemoveUntil(
-        MaterialPageRoute(builder: (_) => const LoginScreen()),
-        (route) => false,
-      );
+    if (confirm == true) {
+      await UserService.logout();
+      if (context.mounted) {
+        Navigator.of(context).pushAndRemoveUntil(
+          MaterialPageRoute(builder: (_) => const LoginScreen()),
+          (route) => false,
+        );
+      }
     }
   }
 
@@ -570,13 +570,12 @@ void _tambahTemanFirebase(String targetUid) async {
             padding: const EdgeInsets.symmetric(vertical: 14),
             shape: RoundedRectangleBorder(
                 borderRadius: BorderRadius.circular(12)),
+            ),
           ),
         ),
-      ),
-    );
+      );
+    }
   }
-}
-
 // ─── Widget Helpers ────────────────────────────────────────────────────────
 
 class _StatBox extends StatelessWidget {
@@ -788,9 +787,9 @@ class _PencapaianCard extends StatelessWidget {
             label,
             style:
                 const TextStyle(color: Colors.white54, fontSize: 11),
-          ),
-        ],
-      ),
-    );
+            ),
+          ],
+        ),
+      );
+    }
   }
-}

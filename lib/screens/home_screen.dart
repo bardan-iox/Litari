@@ -1,17 +1,9 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import '../theme/app_theme.dart';
-<<<<<<< HEAD
 import '../services/user_service.dart';
 import '../widgets/litari_bottom_nav_bar.dart';
-=======
-import '../widgets/litari_logo.dart';
-import '../widgets/litari_bottom_nav_bar.dart';
-import 'pilih_bahasa_screen.dart';
->>>>>>> a7c0bc1 (tambah nav bawah di beberapa halaman,login cuma lewat google)
 import 'materi_screen.dart';
-import 'profil_screen.dart';
-import 'video_screen.dart';
 
 class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});
@@ -448,7 +440,7 @@ class _HomeScreenState extends State<HomeScreen> {
               Container(
                 padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
                 decoration: BoxDecoration(
-                  color: const Color(0xFF2A8AAA).withOpacity(0.2),
+                  color: const Color(0xFF2A8AAA).withValues(alpha: 0.2),
                   borderRadius: BorderRadius.circular(8),
                 ),
                 child: const Text(
@@ -466,7 +458,7 @@ class _HomeScreenState extends State<HomeScreen> {
           Text(
             'Selesaikan 5 latihan hari ini untuk menjaga streakmu!',
             style: TextStyle(
-              color: Colors.white.withOpacity(0.6),
+              color: Colors.white.withValues(alpha: 0.6),
               fontSize: 13,
             ),
           ),

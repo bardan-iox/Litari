@@ -4,6 +4,7 @@ import '../theme/app_theme.dart';
 import '../widgets/litari_logo.dart';
 import '../services/user_service.dart';
 import 'home_screen.dart';
+import 'login_screen.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 
 class RegisterScreen extends StatefulWidget {
@@ -168,7 +169,12 @@ class _RegisterScreenState extends State<RegisterScreen> {
                       style: AppTextStyles.bodySecondary,
                     ),
                     GestureDetector(
-                      onTap: () => Navigator.of(context).pop(),
+                      onTap: () {
+                        Navigator.of(context).push(
+                          MaterialPageRoute(
+                              builder: (_) => const LoginScreen()),
+                        );
+                      },
                       child: const Text('Masuk', style: AppTextStyles.link),
                     ),
                   ],
@@ -320,28 +326,6 @@ class _SocialRegisterRow extends StatelessWidget {
   Widget build(BuildContext context) {
     return Row(
       children: [
-        Expanded(
-          child: _SocialButton(
-            onPressed: () {},
-            child: Row(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                SvgPicture.asset('assets/Facebook_logo.svg',
-                    width: 28, height: 28),
-                const SizedBox(width: 8),
-                const Text(
-                  'facebook',
-                  style: TextStyle(
-                    color: AppColors.facebookBlue,
-                    fontSize: 18,
-                    fontWeight: FontWeight.bold,
-                  ),
-                ),
-              ],
-            ),
-          ),
-        ),
-        const SizedBox(width: 14),
         Expanded(
           child: _SocialButton(
             onPressed: onGooglePressed,

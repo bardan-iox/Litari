@@ -63,7 +63,6 @@ class HasilLatihanScreen extends StatelessWidget {
           ),
         ),
       ),
-      bottomNavigationBar: _buildBottomNav(),
     );
   }
 
@@ -155,33 +154,6 @@ class HasilLatihanScreen extends StatelessWidget {
       ),
     );
   }
-
-  Widget _buildBottomNav() {
-    return Container(
-      decoration: const BoxDecoration(
-        color: AppColors.background,
-        border: Border(
-          top: BorderSide(color: AppColors.divider, width: 0.5),
-        ),
-      ),
-      child: const SafeArea(
-        top: false,
-        child: SizedBox(
-          height: 64,
-          child: Row(
-            mainAxisAlignment: MainAxisAlignment.spaceAround,
-            children: [
-              _NavIcon(icon: Icons.home_rounded, color: Color(0xFFE05252)),
-              _NavIcon(icon: Icons.emoji_events_rounded, color: Color(0xFFD4A017)),
-              _NavIcon(icon: Icons.play_circle_filled, color: Color(0xFF8B2BE2)),
-              _NavIcon(icon: Icons.calculate_rounded, color: Color(0xFF4CAF50)),
-              _NavIcon(icon: Icons.person_rounded, color: Colors.white70),
-            ],
-          ),
-        ),
-      ),
-    );
-  }
 }
 
 // ─── Stat Card ─────────────────────────────────────────────────
@@ -250,19 +222,6 @@ class _StatCard extends StatelessWidget {
         ],
       ),
     );
-  }
-}
-
-// ─── Nav Icon ──────────────────────────────────────────────────
-
-class _NavIcon extends StatelessWidget {
-  final IconData icon;
-  final Color color;
-  const _NavIcon({required this.icon, required this.color});
-
-  @override
-  Widget build(BuildContext context) {
-    return Icon(icon, color: color.withValues(alpha: 0.4), size: 28);
   }
 }
 
