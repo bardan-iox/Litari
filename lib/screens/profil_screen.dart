@@ -1,6 +1,7 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:litari/widgets/litari_bottom_nav_bar.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import '../services/user_service.dart';
 import '../theme/app_theme.dart';
 import 'cari_teman_screen.dart';
