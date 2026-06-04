@@ -5,9 +5,6 @@ import 'package:litari/widgets/litari_bottom_nav_bar.dart';
 import '../services/user_service.dart';
 import '../theme/app_theme.dart';
 import 'splash_screen.dart';
-import 'home_screen.dart';
-import 'video_screen.dart';
-import 'aksara_sunda_screen.dart';
 import 'cari_teman_screen.dart';
 
 class ProfilScreen extends StatelessWidget {

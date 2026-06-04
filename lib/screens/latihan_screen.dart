@@ -2,7 +2,6 @@ import 'dart:async';
 import 'dart:math';
 import 'package:flutter/material.dart';
 import '../theme/app_theme.dart';
-import '../widgets/litari_logo.dart';
 import 'home_screen.dart';
 
 // ════════════════════════════════════════════════════════════════
@@ -89,13 +88,46 @@ const List<GambarSoal> _bankGambar = [
   GambarSoal(kataKunci: 'Tangkal',  emoji: ['🌸','🌲','🍄','🌾'], indexBenar: 1),
   GambarSoal(kataKunci: 'Panonpoe', emoji: ['🌙','🌈','☀️','⭐'], indexBenar: 2),
   GambarSoal(kataKunci: 'Anjing',   emoji: ['🐱','🐶','🐰','🦊'], indexBenar: 1),
+  GambarSoal(kataKunci: 'Sapi',     emoji: ['🐄','🐔','🐟','🐘'], indexBenar: 0),
+];
+
+class AksaraSoal {
+  final String latin;
+  final String aksaraBenar;
+  final List<String> distraktor; // exactly 3
+  const AksaraSoal({required this.latin, required this.aksaraBenar, required this.distraktor});
+}
+
+const List<AksaraSoal> _bankAksara = [
+  AksaraSoal(latin: 'ka',  aksaraBenar: 'ᮊ', distraktor: ['ᮌ', 'ᮎ', 'ᮒ']),
+  AksaraSoal(latin: 'ga',  aksaraBenar: 'ᮌ', distraktor: ['ᮊ', 'ᮍ', 'ᮏ']),
+  AksaraSoal(latin: 'nga', aksaraBenar: 'ᮍ', distraktor: ['ᮌ', 'ᮑ', 'ᮔ']),
+  AksaraSoal(latin: 'ca',  aksaraBenar: 'ᮎ', distraktor: ['ᮏ', 'ᮊ', 'ᮒ']),
+  AksaraSoal(latin: 'ja',  aksaraBenar: 'ᮏ', distraktor: ['ᮎ', 'ᮑ', 'ᮒ']),
+  AksaraSoal(latin: 'nya', aksaraBenar: 'ᮑ', distraktor: ['ᮍ', 'ᮔ', 'ᮚ']),
+  AksaraSoal(latin: 'ta',  aksaraBenar: 'ᮒ', distraktor: ['ᮓ', 'ᮊ', 'ᮕ']),
+  AksaraSoal(latin: 'da',  aksaraBenar: 'ᮓ', distraktor: ['ᮒ', 'ᮔ', 'ᮕ']),
+  AksaraSoal(latin: 'na',  aksaraBenar: 'ᮔ', distraktor: ['ᮓ', 'ᮙ', 'ᮑ']),
+  AksaraSoal(latin: 'pa',  aksaraBenar: 'ᮕ', distraktor: ['ᮘ', 'ᮒ', 'ᮊ']),
+  AksaraSoal(latin: 'ba',  aksaraBenar: 'ᮘ', distraktor: ['ᮕ', 'ᮙ', 'ᮓ']),
+  AksaraSoal(latin: 'ma',  aksaraBenar: 'ᮙ', distraktor: ['ᮘ', 'ᮔ', 'ᮚ']),
+  AksaraSoal(latin: 'ya',  aksaraBenar: 'ᮚ', distraktor: ['ᮛ', 'ᮑ', 'ᮝ']),
+  AksaraSoal(latin: 'ra',  aksaraBenar: 'ᮛ', distraktor: ['ᮚ', 'ᮜ', 'ᮞ']),
+  AksaraSoal(latin: 'la',  aksaraBenar: 'ᮜ', distraktor: ['ᮛ', 'ᮝ', 'ᮞ']),
+  AksaraSoal(latin: 'wa',  aksaraBenar: 'ᮝ', distraktor: ['ᮜ', 'ᮞ', 'ᮚ']),
+  AksaraSoal(latin: 'sa',  aksaraBenar: 'ᮞ', distraktor: ['ᮟ', 'ᮛ', 'ᮠ']),
+  AksaraSoal(latin: 'ha',  aksaraBenar: 'ᮠ', distraktor: ['ᮞ', 'ᮟ', 'ᮊ']),
+  AksaraSoal(latin: 'a',   aksaraBenar: 'ᮄ', distraktor: ['ᮆ', 'ᮇ', 'ᮈ']),
+  AksaraSoal(latin: 'e',   aksaraBenar: 'ᮆ', distraktor: ['ᮄ', 'ᮇ', 'ᮈ']),
+  AksaraSoal(latin: 'o',   aksaraBenar: 'ᮇ', distraktor: ['ᮆ', 'ᮄ', 'ᮈ']),
+  AksaraSoal(latin: 'eu',  aksaraBenar: 'ᮈ', distraktor: ['ᮇ', 'ᮄ', 'ᮆ']),
 ];
 
 // ════════════════════════════════════════════════════════════════
 //  MODEL SOAL (runtime — dibuat oleh generator)
-// ════════════════════════════════════════════════════════════════
+// ══════════════════════════════════════════════
 
-enum TipeSoal { pilihPasangan, pilihGambar }
+enum TipeSoal { pilihPasangan, pilihGambar, pilihAksara }
 
 class Soal {
   final TipeSoal tipe;
@@ -110,6 +142,10 @@ class Soal {
   final List<String> gambarEmoji;     // sudah diacak saat dibuat
   final int? indexBenar;
 
+  final String? latinSoal;
+  final List<String> aksaraOpsi;
+  final int? aksaraIndexBenar;
+
   const Soal._({
     required this.tipe,
     this.opsiKiri = const [],
@@ -118,6 +154,9 @@ class Soal {
     this.kataKunci,
     this.gambarEmoji = const [],
     this.indexBenar,
+    this.latinSoal,
+    this.aksaraOpsi = const [],
+    this.aksaraIndexBenar,
   });
 }
 
@@ -126,13 +165,15 @@ class Soal {
 // ════════════════════════════════════════════════════════════════
 
 /// Jumlah soal per sesi latihan.
-const int _jumlahSoal = 10;
+const int _jumlahSoal = 12;
+const int _soalPasangan = 3;
+const int _soalGambar   = 4;
+const int _soalAksara   = 5;
 
 /// Jumlah pasangan per soal PilihPasangan.
 const int _pasanganPerSoal = 4;
 
 /// Buat daftar [_jumlahSoal] soal acak dari kedua bank.
-/// Komposisi: 6 PilihPasangan + 4 PilihGambar, lalu dikocok.
 List<Soal> _buatDaftarSoal(Random rand) {
   final soalList = <Soal>[];
 
@@ -142,13 +183,13 @@ List<Soal> _buatDaftarSoal(Random rand) {
   final semuaPasangan = List<PasanganKata>.from(_bankPasangan)..shuffle(rand);
 
   // Jika bank tidak cukup untuk 6×4 tanpa pengulangan, putar ulang.
-  final diperlukan = 6 * _pasanganPerSoal;
+  final diperlukan = _soalPasangan * _pasanganPerSoal;
   while (semuaPasangan.length < diperlukan) {
     final tambahan = List<PasanganKata>.from(_bankPasangan)..shuffle(rand);
     semuaPasangan.addAll(tambahan);
   }
 
-  for (int i = 0; i < 6; i++) {
+  for (int i = 0; i < _soalPasangan; i++) {
     final mulai = i * _pasanganPerSoal;
     final picked = semuaPasangan.sublist(mulai, mulai + _pasanganPerSoal);
 
@@ -166,7 +207,7 @@ List<Soal> _buatDaftarSoal(Random rand) {
 
   // ── 4 soal PilihGambar ────────────────────────────────────
   final gambarAcak = List<GambarSoal>.from(_bankGambar)..shuffle(rand);
-  final gambarDipilih = gambarAcak.take(4).toList();
+  final gambarDipilih = gambarAcak.take(_soalGambar).toList();
 
   for (final g in gambarDipilih) {
     // Kocok emoji agar posisi jawaban tidak selalu sama
@@ -181,6 +222,18 @@ List<Soal> _buatDaftarSoal(Random rand) {
       indexBenar: indexBaru,
     ));
   }
+
+  final aksaraAcak = List<AksaraSoal>.from(_bankAksara)..shuffle(rand);
+    for (final a in aksaraAcak.take(_soalAksara)) {
+      final opsi = [a.aksaraBenar, ...a.distraktor]..shuffle(rand);
+      final idxBenar = opsi.indexOf(a.aksaraBenar);
+      soalList.add(Soal._(
+        tipe: TipeSoal.pilihAksara,
+        latinSoal: a.latin,
+        aksaraOpsi: opsi,
+        aksaraIndexBenar: idxBenar,
+      ));
+    }
 
   // Kocok 10 soal agar tipe tidak berurutan monoton
   soalList.shuffle(rand);
@@ -299,9 +352,11 @@ class _LatihanScreenState extends State<LatihanScreen> {
             Expanded(
               // Key memastikan widget direset saat berpindah soal
               key: ValueKey(_soalIndex),
-              child: soal.tipe == TipeSoal.pilihPasangan
-                  ? _PilihPasanganWidget(soal: soal, onJawaban: _onJawaban)
-                  : _PilihGambarWidget(soal: soal, onJawaban: _onJawaban),
+              child: switch (soal.tipe) {
+                TipeSoal.pilihPasangan => _PilihPasanganWidget(soal: soal, onJawaban: _onJawaban),
+                TipeSoal.pilihGambar  => _PilihGambarWidget(soal: soal, onJawaban: _onJawaban),
+                TipeSoal.pilihAksara  => _PilihAksaraWidget(soal: soal, onJawaban: _onJawaban),
+              },
             ),
           ],
         ),
@@ -684,6 +739,156 @@ class _PilihGambarWidgetState extends State<_PilihGambarWidget> {
   }
 }
 
+
+class _PilihAksaraWidget extends StatefulWidget {
+  final Soal soal;
+  final void Function(bool) onJawaban;
+  const _PilihAksaraWidget({required this.soal, required this.onJawaban});
+
+  @override
+  State<_PilihAksaraWidget> createState() => _PilihAksaraWidgetState();
+}
+
+class _PilihAksaraWidgetState extends State<_PilihAksaraWidget> {
+  int?  _dipilih;
+  bool  _sudahJawab = false;
+
+  void _pilih(int index) {
+    if (_sudahJawab) return;
+    final benar = index == widget.soal.aksaraIndexBenar;
+    setState(() { _dipilih = index; _sudahJawab = true; });
+    Future.delayed(const Duration(milliseconds: 900), () {
+      widget.onJawaban(benar);
+    });
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Padding(
+      padding: const EdgeInsets.symmetric(horizontal: 20),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          const SizedBox(height: 16),
+          const Text(
+            'Pilih aksara yang benar',
+            style: TextStyle(color: Colors.white, fontSize: 22, fontWeight: FontWeight.w900),
+          ),
+          const SizedBox(height: 8),
+          Text(
+            'Pilih aksara Sunda yang sesuai dengan suku kata berikut',
+            style: TextStyle(color: Colors.white.withValues(alpha: 0.55), fontSize: 14),
+          ),
+          const SizedBox(height: 24),
+
+          // Latin question prompt
+          Center(
+            child: Container(
+              padding: const EdgeInsets.symmetric(horizontal: 40, vertical: 18),
+              decoration: BoxDecoration(
+                gradient: LinearGradient(
+                  colors: [
+                    AppColors.primary.withValues(alpha: 0.25),
+                    AppColors.primary.withValues(alpha: 0.10),
+                  ],
+                ),
+                borderRadius: BorderRadius.circular(18),
+                border: Border.all(color: AppColors.primary.withValues(alpha: 0.6), width: 2),
+              ),
+              child: Text(
+                widget.soal.latinSoal ?? '',
+                style: const TextStyle(
+                  color: Colors.white,
+                  fontSize: 36,
+                  fontWeight: FontWeight.w900,
+                  letterSpacing: 2,
+                ),
+              ),
+            ),
+          ),
+          const SizedBox(height: 28),
+
+          // 2×2 grid of Aksara Sunda options
+          Expanded(
+            child: GridView.count(
+              crossAxisCount: 2,
+              mainAxisSpacing: 14,
+              crossAxisSpacing: 14,
+              physics: const NeverScrollableScrollPhysics(),
+              children: List.generate(widget.soal.aksaraOpsi.length, (i) {
+                final isBenar   = i == widget.soal.aksaraIndexBenar;
+                final isDipilih = _dipilih == i;
+
+                Color borderColor = AppColors.inputBorder;
+                Color bgColor     = AppColors.surface;
+                Color textColor   = Colors.white;
+
+                if (_sudahJawab && isDipilih) {
+                  borderColor = isBenar ? const Color(0xFF4CAF50) : const Color(0xFFE53935);
+                  bgColor     = isBenar ? const Color(0xFF1B3A1F) : const Color(0xFF3A1B1B);
+                  textColor   = isBenar ? const Color(0xFF4CAF50) : const Color(0xFFE53935);
+                } else if (_sudahJawab && isBenar) {
+                  // reveal correct answer if user picked wrong
+                  borderColor = const Color(0xFF4CAF50);
+                  bgColor     = const Color(0xFF1B3A1F);
+                  textColor   = const Color(0xFF4CAF50);
+                }
+
+                return GestureDetector(
+                  onTap: () => _pilih(i),
+                  child: AnimatedContainer(
+                    duration: const Duration(milliseconds: 200),
+                    decoration: BoxDecoration(
+                      color: bgColor,
+                      borderRadius: BorderRadius.circular(18),
+                      border: Border.all(color: borderColor, width: 2.5),
+                      boxShadow: [
+                        if (!_sudahJawab)
+                          BoxShadow(
+                            color: Colors.black.withValues(alpha: 0.3),
+                            blurRadius: 6,
+                            offset: const Offset(0, 3),
+                          ),
+                      ],
+                    ),
+                    child: Stack(
+                      alignment: Alignment.center,
+                      children: [
+                        Text(
+                          widget.soal.aksaraOpsi[i],
+                          style: TextStyle(
+                            fontFamily: 'aksara_sunda',  // font from pubspec.yaml
+                            color: textColor,
+                            fontSize: 52,
+                            height: 1.2,
+                          ),
+                        ),
+                        if (_sudahJawab && isDipilih)
+                          Positioned(
+                            bottom: 10,
+                            right: 10,
+                            child: Container(
+                              width: 26, height: 26,
+                              decoration: BoxDecoration(
+                                color: isBenar ? const Color(0xFF4CAF50) : const Color(0xFFE53935),
+                                shape: BoxShape.circle,
+                              ),
+                              child: Icon(isBenar ? Icons.check : Icons.close, color: Colors.white, size: 16),
+                            ),
+                          ),
+                      ],
+                    ),
+                  ),
+                );
+              }),
+            ),
+          ),
+          const SizedBox(height: 20),
+        ],
+      ),
+    );
+  }
+}
 // ════════════════════════════════════════════════════════════════
 //  HASIL SCREEN
 // ════════════════════════════════════════════════════════════════

@@ -1,12 +1,7 @@
 import 'package:flutter/material.dart';
 import '../theme/app_theme.dart';
-import '../widgets/litari_logo.dart';
 import '../widgets/litari_bottom_nav_bar.dart';
-import 'pilih_bahasa_screen.dart';
 import 'materi_screen.dart';
-import 'profil_screen.dart';
-import 'video_screen.dart';
-import 'aksara_sunda_screen.dart';
 
 class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});
@@ -548,78 +543,4 @@ class _MiniMascotPainter extends CustomPainter {
 
   @override
   bool shouldRepaint(covariant CustomPainter old) => false;
-}
-
-// ─── Bottom Navigation Bar ─────────────────────────────────────
-
-class _BottomNavBar extends StatelessWidget {
-  final int selectedIndex;
-  final void Function(int) onTap;
-
-  const _BottomNavBar({required this.selectedIndex, required this.onTap});
-
-  @override
-  Widget build(BuildContext context) {
-    return Container(
-      decoration: BoxDecoration(
-        color: AppColors.background,
-        border: Border(top: BorderSide(color: AppColors.divider, width: 0.5)),
-      ),
-      child: SafeArea(
-        top: false,
-        child: SizedBox(
-          height: 64,
-          child: Row(
-            mainAxisAlignment: MainAxisAlignment.spaceAround,
-            children: [
-              _NavItem(icon: Icons.home_rounded,        index: 0, selected: selectedIndex == 0, onTap: onTap, color: const Color(0xFFE05252)),
-              _NavItem(icon: Icons.emoji_events_rounded, index: 1, selected: selectedIndex == 1, onTap: onTap, color: const Color(0xFFD4A017)),
-              _NavItem(icon: Icons.play_circle_filled,  index: 2, selected: selectedIndex == 2, onTap: onTap, color: const Color(0xFF8B2BE2)),
-              _NavItem(icon: Icons.abc_rounded,           index: 3, selected: selectedIndex == 3, onTap: onTap, color: const Color(0xFF4CAF50)),
-              _NavItem(icon: Icons.person_rounded,      index: 4, selected: selectedIndex == 4, onTap: onTap, color: Colors.white70),
-            ],
-          ),
-        ),
-      ),
-    );
-  }
-}
-
-class _NavItem extends StatelessWidget {
-  final IconData icon;
-  final int index;
-  final bool selected;
-  final void Function(int) onTap;
-  final Color color;
-
-  const _NavItem({
-    required this.icon,
-    required this.index,
-    required this.selected,
-    required this.onTap,
-    required this.color,
-  });
-
-  @override
-  Widget build(BuildContext context) {
-    return GestureDetector(
-      onTap: () => onTap(index),
-      behavior: HitTestBehavior.opaque,
-      child: AnimatedContainer(
-        duration: const Duration(milliseconds: 200),
-        padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 8),
-        decoration: selected
-            ? BoxDecoration(
-                color: color.withOpacity(0.12),
-                borderRadius: BorderRadius.circular(12),
-              )
-            : null,
-        child: Icon(
-          icon,
-          color: selected ? color : Colors.white38,
-          size: 28,
-        ),
-      ),
-    );
-  }
 }
