@@ -63,8 +63,17 @@ class _LoginScreenState extends State<LoginScreen> {
           case 'invalid-email':
             _errorMessage = 'Format email tidak valid';
             break;
+          case 'invalid-credential':
+            _errorMessage = 'Email atau kata sandi salah';
+            break;
+          case 'user-disabled':
+            _errorMessage = 'Akun ini telah dinonaktifkan';
+            break;
+          case 'too-many-requests':
+            _errorMessage = 'Terlalu banyak percobaan, coba lagi nanti';
+            break;
           default:
-            _errorMessage = e.message ?? 'Login gagal, coba lagi';
+            _errorMessage = 'Login gagal, coba lagi';
         }
       });
     } catch (e) {

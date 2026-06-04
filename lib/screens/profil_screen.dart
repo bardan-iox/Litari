@@ -1,11 +1,21 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:litari/widgets/litari_bottom_nav_bar.dart';
 import '../services/user_service.dart';
 import '../theme/app_theme.dart';
-import 'splash_screen.dart';
 import 'cari_teman_screen.dart';
+
+// ID achievement yang ditampilkan di bagian "Lencana" (subset visual)
+const _lencanaIds = {
+  'materi_1':      {'color': Color(0xFFCD7F32), 'label': '1 Materi'},
+  'materi_5':      {'color': Color(0xFFC0C0C0), 'label': '5 Materi'},
+  'materi_10':     {'color': Color(0xFFFFD700), 'label': '10 Materi'},
+  'materi_25':     {'color': Color(0xFFE07B3A), 'label': '25 Materi'},
+  'lencana_sunda': {'color': Color(0xFF4CAF50), 'label': 'Sunda'},
+  'lencana_jawa':  {'color': Color(0xFFFF9800), 'label': 'Jawa'},
+  'lencana_melayu':{'color': Color(0xFF2196F3), 'label': 'Melayu'},
+  'lencana_bali':  {'color': Color(0xFFE91E63), 'label': 'Bali'},
+};
 
 class ProfilScreen extends StatelessWidget {
   const ProfilScreen({super.key});
@@ -42,16 +52,12 @@ class ProfilScreen extends StatelessWidget {
     ),
   );
 
-  if (confirm == true) {
-    await UserService.logout();
-    if (context.mounted) {
-      Navigator.of(context).pushAndRemoveUntil(
-        MaterialPageRoute(builder: (_) => const SplashScreen()),
-        (route) => false,
-      );
+    if (confirm == true) {
+      await UserService.logout();
+      // Tidak perlu navigasi manual — StreamBuilder di main.dart
+      // otomatis redirect ke SplashScreen saat auth state berubah ke null
     }
   }
-}
 
   @override
   Widget build(BuildContext context) {
@@ -432,30 +438,10 @@ void _tambahTemanFirebase(String targetUid) async {
   // ─── Lencana ───────────────────────────────────────
 
   Widget _buildLencana(Map<String, dynamic> data) {
-    final lencana = List<String>.from(data['lencana'] ?? []);
-
-    final lencanaDisplay = {
-      'misi_1': {'color': const Color(0xFFCD7F32), 'label': '1 Materi'},
-      'misi_3': {'color': const Color(0xFFC0C0C0), 'label': '3 Materi'},
-      'misi_5': {'color': const Color(0xFFFFD700), 'label': '5 Materi'},
-      'misi_10': {'color': AppColors.primary, 'label': '10 Materi'},
-      'lencana_sunda': {
-        'color': const Color(0xFF4CAF50),
-        'label': 'Sunda'
-      },
-      'lencana_jawa': {
-        'color': const Color(0xFFFF9800),
-        'label': 'Jawa'
-      },
-      'lencana_melayu': {
-        'color': const Color(0xFF2196F3),
-        'label': 'Melayu'
-      },
-      'lencana_bali': {
-        'color': const Color(0xFFE91E63),
-        'label': 'Bali'
-      },
-    };
+    final achievements = List<String>.from(data['achievements'] ?? []);
+    // Hitung hanya lencana yang ada di _lencanaIds (subset visual)
+    final lencanaDiraih =
+        achievements.where((id) => _lencanaIds.containsKey(id)).length;
 
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: 16),
@@ -474,7 +460,7 @@ void _tambahTemanFirebase(String targetUid) async {
                 ),
               ),
               Text(
-                '${lencana.length} diraih',
+                '$lencanaDiraih diraih',
                 style: const TextStyle(
                   color: AppColors.primary,
                   fontSize: 14,
@@ -487,8 +473,8 @@ void _tambahTemanFirebase(String targetUid) async {
           Wrap(
             spacing: 12,
             runSpacing: 12,
-            children: lencanaDisplay.entries.map((e) {
-              final earned = lencana.contains(e.key);
+            children: _lencanaIds.entries.map((e) {
+              final earned = achievements.contains(e.key);
               final color = e.value['color'] as Color;
               final label = e.value['label'] as String;
               return _LencanaItem(
@@ -503,7 +489,7 @@ void _tambahTemanFirebase(String targetUid) async {
   // ─── Pencapaian ────────────────────────────────────
 
   Widget _buildPencapaian(Map<String, dynamic> data) {
-    final lencana = List<String>.from(data['lencana'] ?? []);
+    final achievements = List<String>.from(data['achievements'] ?? []);
     final totalMateri = data['totalMateriSelesai'] as int? ?? 0;
     final xp = data['xp'] as int? ?? 0;
 
@@ -527,8 +513,8 @@ void _tambahTemanFirebase(String targetUid) async {
                 child: _PencapaianCard(
                   icon: Icons.emoji_events_rounded,
                   color: const Color(0xFFFFD700),
-                  label: 'Lencana',
-                  value: '${lencana.length}',
+                  label: 'Achievement',
+                  value: '${achievements.length}',
                 ),
               ),
               const SizedBox(width: 12),

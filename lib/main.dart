@@ -6,7 +6,6 @@ import 'firebase_options.dart';
 import 'theme/app_theme.dart';
 import 'screens/splash_screen.dart';
 import 'screens/home_screen.dart';
-import 'screens/login_screen.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -35,12 +34,19 @@ class LitariApp extends StatelessWidget {
         stream: FirebaseAuth.instance.authStateChanges(),
         builder: (context, snapshot) {
           if (snapshot.connectionState == ConnectionState.waiting) {
-            return const SplashScreen();
+            return const Scaffold(
+              backgroundColor: Color(0xFF1A1F2E),
+              body: Center(
+                child: CircularProgressIndicator(
+                  color: Color(0xFFE07B3A),
+                ),
+              ),
+            );
           }
           if (snapshot.hasData) {
             return const HomeScreen();
           }
-          return const LoginScreen();
+          return const SplashScreen();
         },
       ),
     );

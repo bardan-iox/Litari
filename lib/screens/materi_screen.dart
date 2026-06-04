@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import '../theme/app_theme.dart';
+import '../services/user_service.dart';
 import 'latihan_screen.dart';
 
 // ─── Data model ──────────────────────────────────────────────
@@ -78,18 +79,15 @@ const Map<String, _BahasaTheme> _bahasaThemes = {
 // ─── Generate data materi ────────────────────────────────────
 
 List<MateriItem> _generateMateri() {
+  // Data awal sebelum Firestore load — semua kosong, hanya Materi 1 terbuka
   return List.generate(10, (i) {
     final nomor = i + 1;
-    final isLocked = nomor > 5; // materi 6-10 locked
     return MateriItem(
       nama: 'Materi $nomor',
       nomor: nomor,
-      isLocked: isLocked,
+      isLocked: nomor > 1,
       subMateri: List.generate(3, (j) {
-        return SubMateri(
-          nama: 'Materi $nomor.${j + 1}',
-          selesai: nomor == 1 && j < 2, // 1.1 dan 1.2 sudah selesai
-        );
+        return SubMateri(nama: 'Materi $nomor.${j + 1}', selesai: false);
       }),
     );
   });
@@ -114,6 +112,41 @@ class _MateriScreenState extends State<MateriScreen> {
   void initState() {
     super.initState();
     _materi = _generateMateri();
+    _loadProgress();
+  }
+
+  Future<void> _loadProgress() async {
+    final data = await UserService.getUserData();
+    if (data == null || !mounted) return;
+    final materiSelesai = Map<String, dynamic>.from(data['materiSelesai'] ?? {});
+    setState(() {
+      _materi = _buildMateriWithProgress(materiSelesai);
+    });
+  }
+
+  List<MateriItem> _buildMateriWithProgress(Map<String, dynamic> materiSelesai) {
+    return List.generate(10, (i) {
+      final nomor = i + 1;
+      // Materi terbuka jika materi sebelumnya sudah ada minimal 1 sub-materi selesai,
+      // atau materi pertama selalu terbuka
+      final prevSelesai = nomor == 1
+          ? true
+          : List.generate(3, (j) => 'Materi ${nomor - 1}.${j + 1}')
+              .any((k) => materiSelesai['${widget.bahasaKey}.$k'] == true);
+      final isLocked = !prevSelesai;
+      return MateriItem(
+        nama: 'Materi $nomor',
+        nomor: nomor,
+        isLocked: isLocked,
+        subMateri: List.generate(3, (j) {
+          final subKey = '${widget.bahasaKey}.Materi $nomor.${j + 1}';
+          return SubMateri(
+            nama: 'Materi $nomor.${j + 1}',
+            selesai: materiSelesai[subKey] == true,
+          );
+        }),
+      );
+    });
   }
 
   _BahasaTheme get _theme =>
@@ -127,14 +160,24 @@ class _MateriScreenState extends State<MateriScreen> {
   }
 
   void _toggleSubMateri(int materiIndex, int subIndex) {
-    setState(() {
-      _materi[materiIndex].subMateri[subIndex].selesai = true;
-    });
+    final namaMateri = _materi[materiIndex].nama;
+    final namaSubMateri = _materi[materiIndex].subMateri[subIndex].nama;
+    // Simpan bahasa & materi terakhir ke Firestore
+    UserService.simpanLastBahasa(
+      bahasaKey: widget.bahasaKey,
+      namaMateri: namaMateri,
+    );
     Navigator.of(context).push(
       MaterialPageRoute(
-        builder: (_) => LatihanScreen(bahasaKey: widget.bahasaKey),
+        builder: (_) => LatihanScreen(
+          bahasaKey: widget.bahasaKey,
+          materiKey: namaSubMateri, // contoh: 'Materi 1.1'
+        ),
       ),
-    );
+    ).then((_) {
+      // Reload progress setelah kembali dari latihan
+      _loadProgress();
+    });
   }
 
   @override
