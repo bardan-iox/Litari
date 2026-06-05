@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import '../theme/app_theme.dart';
 import '../widgets/litari_bottom_nav_bar.dart';
+import 'home_screen.dart';
 
 // ════════════════════════════════════════════════════════════════
 //  DATA AKSARA SUNDA
@@ -109,7 +110,13 @@ class _AksaraSundaScreenState extends State<AksaraSundaScreen>
         children: [
           IconButton(
             icon: const Icon(Icons.arrow_back_ios_new, color: Colors.white),
-            onPressed: () => Navigator.of(context).pop(),
+            onPressed: () => () {
+              Navigator.of(context).pushAndRemoveUntil(
+                MaterialPageRoute(
+                  builder: (_) => const HomeScreen()),
+                  (route) => false,
+                );
+              },
           ),
           const Text(
             'Aksara Sunda',

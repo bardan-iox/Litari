@@ -644,8 +644,7 @@ class _HasilScreenState extends State<_HasilScreen> {
                 ],
               ),
             ),
-            const SizedBox(height: 20),
-            _BottomNavSimple(),
+            const SizedBox(height: 20)
           ],
         ),
       ),
