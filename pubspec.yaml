@@ -6,21 +6,38 @@ publish_to: 'none'
 version: 1.0.0+1
 
 environment:
-  sdk: '>=3.0.0 <4.0.0'
+  sdk: ">=3.0.0 <4.0.0"
 
 dependencies:
   flutter:
     sdk: flutter
 
+  flutter_svg: ^2.0.10
+  youtube_player_iframe: ^5.2.1
+
+  firebase_core: ^3.0.0
+  firebase_auth: ^5.0.0
+  google_sign_in: ^6.2.1
+  cloud_firestore: ^5.0.0
+  
+
 dev_dependencies:
   flutter_test:
     sdk: flutter
-  flutter_svg: ^2.0.10
+
   flutter_lints: ^3.0.0
 
 flutter:
   uses-material-design: true
 
+  fonts:
+    - family: aksara_sunda
+      fonts:
+        - asset: assets/fonts/Aksara_sunda.otf
   assets:
     - assets/Google_logo.svg
     - assets/Facebook_logo.svg
+    - assets/images/sunda.png
+    - assets/images/jawa.jpg
+    - assets/images/bali.jpeg
+    - assets/images/melayu.jpg

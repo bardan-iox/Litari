@@ -2,26 +2,23 @@ import 'dart:async';
 import 'dart:math';
 import 'package:flutter/material.dart';
 import '../theme/app_theme.dart';
-import '../widgets/litari_logo.dart';
+import '../services/user_service.dart';
+import 'home_screen.dart';
 
 // ════════════════════════════════════════════════════════════════
 //  BANK SOAL — tambah item di sini untuk memperluas konten
 // ════════════════════════════════════════════════════════════════
 
-/// Satu pasangan kata Indonesia ↔ Sunda.
-/// Tambah baris baru di [_bankPasangan] untuk memperluas bank.
 class PasanganKata {
   final String indonesia;
   final String sunda;
   const PasanganKata(this.indonesia, this.sunda);
 }
 
-/// Satu soal pilih-gambar.
-/// Tambah item baru di [_bankGambar] untuk memperluas bank.
 class GambarSoal {
-  final String kataKunci;           // kata Sunda yang ditampilkan
-  final List<String> emoji;         // tepat 4 emoji pilihan
-  final int indexBenar;             // index jawaban yang benar di [emoji]
+  final String kataKunci;
+  final List<String> emoji;
+  final int indexBenar;
   const GambarSoal({
     required this.kataKunci,
     required this.emoji,
@@ -29,53 +26,40 @@ class GambarSoal {
   });
 }
 
-// ─── Bank Pasangan Kata ───────────────────────────────────────
-// Perlu minimal 4 pasangan agar setiap soal PilihPasangan bisa
-// menampilkan 4 pilihan acak. Semakin banyak, semakin beragam.
-
 const List<PasanganKata> _bankPasangan = [
-  // Pertanyaan & sapaan
-  PasanganKata('Dari mana',  'Timana'),
-  PasanganKata('Kemana',     'Kamana'),
-  PasanganKata('Kapan',      'Iraha'),
-  PasanganKata('Permisi',    'Punten'),
-  PasanganKata('Silahkan',   'Mangga'),
-  PasanganKata('Terima kasih','Hatur nuhun'),
-  PasanganKata('Sama-sama',  'Sami-sami'),
-  // Kegiatan sehari-hari
-  PasanganKata('Makan',      'Dahar'),
-  PasanganKata('Minum',      'Nginum'),
-  PasanganKata('Tidur',      'Sare'),
-  PasanganKata('Berjalan',   'Leumpang'),
-  PasanganKata('Duduk',      'Diuk'),
-  PasanganKata('Berlari',    'Lumpat'),
-  PasanganKata('Membaca',    'Maca'),
-  PasanganKata('Menulis',    'Nulis'),
-  // Benda & alam
-  PasanganKata('Rumah',      'Imah'),
-  PasanganKata('Air',        'Cai'),
-  PasanganKata('Api',        'Seuneu'),
-  PasanganKata('Batu',       'Batu'),
-  PasanganKata('Pohon',      'Tangkal'),
-  PasanganKata('Bulan',      'Bulan'),
-  PasanganKata('Matahari',   'Panonpoe'),
-  // Sifat
-  PasanganKata('Bagus',      'Alus'),
-  PasanganKata('Besar',      'Gede'),
-  PasanganKata('Kecil',      'Leutik'),
-  PasanganKata('Jauh',       'Jauh'),
-  PasanganKata('Dekat',      'Deukeut'),
-  // Angka
-  PasanganKata('Satu',       'Hiji'),
-  PasanganKata('Dua',        'Dua'),
-  PasanganKata('Tiga',       'Tilu'),
-  PasanganKata('Empat',      'Opat'),
-  PasanganKata('Lima',       'Lima'),
+  PasanganKata('Dari mana',    'Timana'),
+  PasanganKata('Kemana',       'Kamana'),
+  PasanganKata('Kapan',        'Iraha'),
+  PasanganKata('Permisi',      'Punten'),
+  PasanganKata('Silahkan',     'Mangga'),
+  PasanganKata('Terima kasih', 'Hatur nuhun'),
+  PasanganKata('Sama-sama',    'Sami-sami'),
+  PasanganKata('Makan',        'Dahar'),
+  PasanganKata('Minum',        'Nginum'),
+  PasanganKata('Tidur',        'Sare'),
+  PasanganKata('Berjalan',     'Leumpang'),
+  PasanganKata('Duduk',        'Diuk'),
+  PasanganKata('Berlari',      'Lumpat'),
+  PasanganKata('Membaca',      'Maca'),
+  PasanganKata('Menulis',      'Nulis'),
+  PasanganKata('Rumah',        'Imah'),
+  PasanganKata('Air',          'Cai'),
+  PasanganKata('Api',          'Seuneu'),
+  PasanganKata('Batu',         'Batu'),
+  PasanganKata('Pohon',        'Tangkal'),
+  PasanganKata('Bulan',        'Bulan'),
+  PasanganKata('Matahari',     'Panonpoe'),
+  PasanganKata('Bagus',        'Alus'),
+  PasanganKata('Besar',        'Gede'),
+  PasanganKata('Kecil',        'Leutik'),
+  PasanganKata('Jauh',         'Jauh'),
+  PasanganKata('Dekat',        'Deukeut'),
+  PasanganKata('Satu',         'Hiji'),
+  PasanganKata('Dua',          'Dua'),
+  PasanganKata('Tiga',         'Tilu'),
+  PasanganKata('Empat',        'Opat'),
+  PasanganKata('Lima',         'Lima'),
 ];
-
-// ─── Bank Gambar ──────────────────────────────────────────────
-// Setiap item HARUS memiliki tepat 4 emoji.
-// Pastikan indexBenar sesuai posisi jawaban di list emoji.
 
 const List<GambarSoal> _bankGambar = [
   GambarSoal(kataKunci: 'Imah',     emoji: ['🍳','🏠','🔪','🐟'], indexBenar: 1),
@@ -88,26 +72,60 @@ const List<GambarSoal> _bankGambar = [
   GambarSoal(kataKunci: 'Tangkal',  emoji: ['🌸','🌲','🍄','🌾'], indexBenar: 1),
   GambarSoal(kataKunci: 'Panonpoe', emoji: ['🌙','🌈','☀️','⭐'], indexBenar: 2),
   GambarSoal(kataKunci: 'Anjing',   emoji: ['🐱','🐶','🐰','🦊'], indexBenar: 1),
+  GambarSoal(kataKunci: 'Sapi',     emoji: ['🐄','🐔','🐟','🐘'], indexBenar: 0),
+];
+
+class AksaraSoal {
+  final String latin;
+  final String aksaraBenar;
+  final List<String> distraktor; // exactly 3
+  const AksaraSoal({required this.latin, required this.aksaraBenar, required this.distraktor});
+}
+
+const List<AksaraSoal> _bankAksara = [
+  AksaraSoal(latin: 'ka',  aksaraBenar: 'ᮊ', distraktor: ['ᮌ', 'ᮎ', 'ᮒ']),
+  AksaraSoal(latin: 'ga',  aksaraBenar: 'ᮌ', distraktor: ['ᮊ', 'ᮍ', 'ᮏ']),
+  AksaraSoal(latin: 'nga', aksaraBenar: 'ᮍ', distraktor: ['ᮌ', 'ᮑ', 'ᮔ']),
+  AksaraSoal(latin: 'ca',  aksaraBenar: 'ᮎ', distraktor: ['ᮏ', 'ᮊ', 'ᮒ']),
+  AksaraSoal(latin: 'ja',  aksaraBenar: 'ᮏ', distraktor: ['ᮎ', 'ᮑ', 'ᮒ']),
+  AksaraSoal(latin: 'nya', aksaraBenar: 'ᮑ', distraktor: ['ᮍ', 'ᮔ', 'ᮚ']),
+  AksaraSoal(latin: 'ta',  aksaraBenar: 'ᮒ', distraktor: ['ᮓ', 'ᮊ', 'ᮕ']),
+  AksaraSoal(latin: 'da',  aksaraBenar: 'ᮓ', distraktor: ['ᮒ', 'ᮔ', 'ᮕ']),
+  AksaraSoal(latin: 'na',  aksaraBenar: 'ᮔ', distraktor: ['ᮓ', 'ᮙ', 'ᮑ']),
+  AksaraSoal(latin: 'pa',  aksaraBenar: 'ᮕ', distraktor: ['ᮘ', 'ᮒ', 'ᮊ']),
+  AksaraSoal(latin: 'ba',  aksaraBenar: 'ᮘ', distraktor: ['ᮕ', 'ᮙ', 'ᮓ']),
+  AksaraSoal(latin: 'ma',  aksaraBenar: 'ᮙ', distraktor: ['ᮘ', 'ᮔ', 'ᮚ']),
+  AksaraSoal(latin: 'ya',  aksaraBenar: 'ᮚ', distraktor: ['ᮛ', 'ᮑ', 'ᮝ']),
+  AksaraSoal(latin: 'ra',  aksaraBenar: 'ᮛ', distraktor: ['ᮚ', 'ᮜ', 'ᮞ']),
+  AksaraSoal(latin: 'la',  aksaraBenar: 'ᮜ', distraktor: ['ᮛ', 'ᮝ', 'ᮞ']),
+  AksaraSoal(latin: 'wa',  aksaraBenar: 'ᮝ', distraktor: ['ᮜ', 'ᮞ', 'ᮚ']),
+  AksaraSoal(latin: 'sa',  aksaraBenar: 'ᮞ', distraktor: ['ᮟ', 'ᮛ', 'ᮠ']),
+  AksaraSoal(latin: 'ha',  aksaraBenar: 'ᮠ', distraktor: ['ᮞ', 'ᮟ', 'ᮊ']),
+  AksaraSoal(latin: 'a',   aksaraBenar: 'ᮃ', distraktor: ['ᮆ', 'ᮇ', 'ᮈ']),
+  AksaraSoal(latin: 'i',   aksaraBenar: 'ᮄ', distraktor: ['ᮆ', 'ᮇ', 'ᮈ']),
+  AksaraSoal(latin: 'e',   aksaraBenar: 'ᮆ', distraktor: ['ᮄ', 'ᮇ', 'ᮈ']),
+  AksaraSoal(latin: 'o',   aksaraBenar: 'ᮇ', distraktor: ['ᮆ', 'ᮄ', 'ᮈ']),
+  AksaraSoal(latin: 'eu',  aksaraBenar: 'ᮈ', distraktor: ['ᮇ', 'ᮄ', 'ᮆ']),
 ];
 
 // ════════════════════════════════════════════════════════════════
-//  MODEL SOAL (runtime — dibuat oleh generator)
+//  MODEL SOAL
 // ════════════════════════════════════════════════════════════════
 
-enum TipeSoal { pilihPasangan, pilihGambar }
+enum TipeSoal { pilihPasangan, pilihGambar, pilihAksara }
 
 class Soal {
   final TipeSoal tipe;
-
-  // PilihPasangan
   final List<String> opsiKiri;
-  final List<String> opsiKanan;       // sudah diacak saat dibuat
-  final Map<String, String> jawaban;  // kiri → kanan yang benar
-
-  // PilihGambar
+  final List<String> opsiKanan;
+  final Map<String, String> jawaban;
   final String? kataKunci;
-  final List<String> gambarEmoji;     // sudah diacak saat dibuat
+  final List<String> gambarEmoji;
   final int? indexBenar;
+
+  final String? latinSoal;
+  final List<String> aksaraOpsi;
+  final int? aksaraIndexBenar;
 
   const Soal._({
     required this.tipe,
@@ -117,6 +135,9 @@ class Soal {
     this.kataKunci,
     this.gambarEmoji = const [],
     this.indexBenar,
+    this.latinSoal,
+    this.aksaraOpsi = const [],
+    this.aksaraIndexBenar,
   });
 }
 
@@ -126,60 +147,62 @@ class Soal {
 
 /// Jumlah soal per sesi latihan.
 const int _jumlahSoal = 10;
+const int _soalPasangan = 3;
+const int _soalGambar   = 3;
+const int _soalAksara   = 4;
 
 /// Jumlah pasangan per soal PilihPasangan.
 const int _pasanganPerSoal = 4;
 
 /// Buat daftar [_jumlahSoal] soal acak dari kedua bank.
-/// Komposisi: 6 PilihPasangan + 4 PilihGambar, lalu dikocok.
 List<Soal> _buatDaftarSoal(Random rand) {
   final soalList = <Soal>[];
 
-  // ── 6 soal PilihPasangan ──────────────────────────────────
-  // Kocok semua pasangan lalu ambil berurutan dengan jendela geser
-  // sehingga antar soal tidak banyak mengulang pasangan yang sama.
   final semuaPasangan = List<PasanganKata>.from(_bankPasangan)..shuffle(rand);
 
   // Jika bank tidak cukup untuk 6×4 tanpa pengulangan, putar ulang.
-  final diperlukan = 6 * _pasanganPerSoal;
+  const diperlukan = _soalPasangan * _pasanganPerSoal;
   while (semuaPasangan.length < diperlukan) {
-    final tambahan = List<PasanganKata>.from(_bankPasangan)..shuffle(rand);
-    semuaPasangan.addAll(tambahan);
+    semuaPasangan.addAll(List<PasanganKata>.from(_bankPasangan)..shuffle(rand));
   }
 
-  for (int i = 0; i < 6; i++) {
+  for (int i = 0; i < _soalPasangan; i++) {
     final mulai = i * _pasanganPerSoal;
     final picked = semuaPasangan.sublist(mulai, mulai + _pasanganPerSoal);
-
-    final opsiKiri = picked.map((p) => p.indonesia).toList();
-    final opsiKanan = picked.map((p) => p.sunda).toList()..shuffle(rand);
-    final jawaban = {for (final p in picked) p.indonesia: p.sunda};
-
     soalList.add(Soal._(
-      tipe: TipeSoal.pilihPasangan,
-      opsiKiri: opsiKiri,
-      opsiKanan: opsiKanan,
-      jawaban: jawaban,
+      tipe:      TipeSoal.pilihPasangan,
+      opsiKiri:  picked.map((p) => p.indonesia).toList(),
+      opsiKanan: picked.map((p) => p.sunda).toList()..shuffle(rand),
+      jawaban:   {for (final p in picked) p.indonesia: p.sunda},
     ));
   }
 
-  // ── 4 soal PilihGambar ────────────────────────────────────
   final gambarAcak = List<GambarSoal>.from(_bankGambar)..shuffle(rand);
-  final gambarDipilih = gambarAcak.take(4).toList();
+  final gambarDipilih = gambarAcak.take(_soalGambar).toList();
 
   for (final g in gambarDipilih) {
     // Kocok emoji agar posisi jawaban tidak selalu sama
     final indexed = List.generate(g.emoji.length, (i) => i)..shuffle(rand);
     final emojiAcak = indexed.map((i) => g.emoji[i]).toList();
-    final indexBaru = indexed.indexOf(g.indexBenar);
-
     soalList.add(Soal._(
-      tipe: TipeSoal.pilihGambar,
-      kataKunci: g.kataKunci,
+      tipe:        TipeSoal.pilihGambar,
+      kataKunci:   g.kataKunci,
       gambarEmoji: emojiAcak,
-      indexBenar: indexBaru,
+      indexBenar:  indexed.indexOf(g.indexBenar),
     ));
   }
+
+  final aksaraAcak = List<AksaraSoal>.from(_bankAksara)..shuffle(rand);
+    for (final a in aksaraAcak.take(_soalAksara)) {
+      final opsi = [a.aksaraBenar, ...a.distraktor]..shuffle(rand);
+      final idxBenar = opsi.indexOf(a.aksaraBenar);
+      soalList.add(Soal._(
+        tipe: TipeSoal.pilihAksara,
+        latinSoal: a.latin,
+        aksaraOpsi: opsi,
+        aksaraIndexBenar: idxBenar,
+      ));
+    }
 
   // Kocok 10 soal agar tipe tidak berurutan monoton
   soalList.shuffle(rand);
@@ -192,7 +215,13 @@ List<Soal> _buatDaftarSoal(Random rand) {
 
 class LatihanScreen extends StatefulWidget {
   final String bahasaKey;
-  const LatihanScreen({super.key, required this.bahasaKey});
+  final String materiKey;
+
+  const LatihanScreen({
+    super.key,
+    required this.bahasaKey,
+    this.materiKey = 'latihan',
+  });
 
   @override
   State<LatihanScreen> createState() => _LatihanScreenState();
@@ -205,7 +234,6 @@ class _LatihanScreenState extends State<LatihanScreen> {
   int  _salah     = 0;
   bool _selesai   = false;
 
-  // Timer
   late Stopwatch _stopwatch;
   late Timer     _timer;
   String _waktu = '0:00';
@@ -213,14 +241,14 @@ class _LatihanScreenState extends State<LatihanScreen> {
   @override
   void initState() {
     super.initState();
-    _soalList = _buatDaftarSoal(Random());
+    _soalList  = _buatDaftarSoal(Random());
     _stopwatch = Stopwatch()..start();
-    _timer = Timer.periodic(const Duration(seconds: 1), (_) {
+    _timer     = Timer.periodic(const Duration(seconds: 1), (_) {
       if (!mounted) return;
       setState(() {
         final m = _stopwatch.elapsed.inMinutes;
         final s = _stopwatch.elapsed.inSeconds % 60;
-        _waktu = '$m:${s.toString().padLeft(2, '0')}';
+        _waktu  = '$m:${s.toString().padLeft(2, '0')}';
       });
     });
   }
@@ -253,7 +281,13 @@ class _LatihanScreenState extends State<LatihanScreen> {
   @override
   Widget build(BuildContext context) {
     if (_selesai) {
-      return HasilScreen(benar: _benar, salah: _salah, waktu: _waktu);
+      return _HasilScreen(
+        benar:      _benar,
+        salah:      _salah,
+        waktu:      _waktu,
+        bahasaKey:  widget.bahasaKey,
+        materiKey:  widget.materiKey,
+      );
     }
 
     final soal = _soalList[_soalIndex];
@@ -263,7 +297,6 @@ class _LatihanScreenState extends State<LatihanScreen> {
       body: SafeArea(
         child: Column(
           children: [
-            // ── Header: tombol tutup + progress bar ──────────
             Padding(
               padding: const EdgeInsets.fromLTRB(16, 16, 16, 8),
               child: Row(
@@ -277,15 +310,14 @@ class _LatihanScreenState extends State<LatihanScreen> {
                     child: ClipRRect(
                       borderRadius: BorderRadius.circular(8),
                       child: LinearProgressIndicator(
-                        value: _progress,
-                        minHeight: 10,
+                        value:           _progress,
+                        minHeight:       10,
                         backgroundColor: const Color(0xFF3D4560),
-                        valueColor: const AlwaysStoppedAnimation<Color>(AppColors.primary),
+                        valueColor:      const AlwaysStoppedAnimation<Color>(AppColors.primary),
                       ),
                     ),
                   ),
                   const SizedBox(width: 12),
-                  // Nomor soal
                   Text(
                     '${_soalIndex + 1}/${_soalList.length}',
                     style: const TextStyle(color: Colors.white54, fontSize: 13),
@@ -293,15 +325,326 @@ class _LatihanScreenState extends State<LatihanScreen> {
                 ],
               ),
             ),
-
-            // ── Konten soal ───────────────────────────────────
             Expanded(
               // Key memastikan widget direset saat berpindah soal
               key: ValueKey(_soalIndex),
-              child: soal.tipe == TipeSoal.pilihPasangan
-                  ? _PilihPasanganWidget(soal: soal, onJawaban: _onJawaban)
-                  : _PilihGambarWidget(soal: soal, onJawaban: _onJawaban),
+              child: switch (soal.tipe) {
+                TipeSoal.pilihPasangan => _PilihPasanganWidget(soal: soal, onJawaban: _onJawaban),
+                TipeSoal.pilihGambar  => _PilihGambarWidget(soal: soal, onJawaban: _onJawaban),
+                TipeSoal.pilihAksara  => _PilihAksaraWidget(soal: soal, onJawaban: _onJawaban),
+              },
             ),
+          ],
+        ),
+      ),
+    );
+  }
+}
+
+// ════════════════════════════════════════════════════════════════
+//  HASIL SCREEN — simpan ke Firestore & tampilkan achievement
+// ════════════════════════════════════════════════════════════════
+
+class _HasilScreen extends StatefulWidget {
+  final int    benar;
+  final int    salah;
+  final String waktu;
+  final String bahasaKey;
+  final String materiKey;
+
+  const _HasilScreen({
+    required this.benar,
+    required this.salah,
+    required this.waktu,
+    required this.bahasaKey,
+    required this.materiKey,
+  });
+
+  @override
+  State<_HasilScreen> createState() => _HasilScreenState();
+}
+
+class _HasilScreenState extends State<_HasilScreen> {
+  HasilLatihan? _hasil;
+  bool _loading = true;
+
+  @override
+  void initState() {
+    super.initState();
+    _simpan();
+  }
+
+  Future<void> _simpan() async {
+    final hasil = await UserService.selesaikanLatihan(
+      benar:      widget.benar,
+      total:      widget.benar + widget.salah,
+      bahasaKey:  widget.bahasaKey,
+      materiKey:  widget.materiKey,
+    );
+    if (!mounted) return;
+    setState(() {
+      _hasil   = hasil;
+      _loading = false;
+    });
+
+    // Tampilkan snackbar achievement jika ada yang baru
+    if (hasil.achievementBaru.isNotEmpty) {
+      Future.delayed(const Duration(milliseconds: 600), () {
+        if (!mounted) return;
+        _tampilkanAchievement(hasil.achievementBaru);
+      });
+    }
+  }
+
+  void _tampilkanAchievement(List<AchievementDef> list) {
+    for (int i = 0; i < list.length; i++) {
+      Future.delayed(Duration(milliseconds: i * 1800), () {
+        if (!mounted) return;
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            duration:         const Duration(seconds: 2),
+            backgroundColor:  const Color(0xFF252B3B),
+            behavior:         SnackBarBehavior.floating,
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(12),
+              side: BorderSide(color: AppColors.primary.withValues(alpha: 0.5)),
+            ),
+            content: Row(
+              children: [
+                const Text('🏆', style: TextStyle(fontSize: 24)),
+                const SizedBox(width: 12),
+                Expanded(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    mainAxisSize:       MainAxisSize.min,
+                    children: [
+                      const Text(
+                        'Achievement Terbuka!',
+                        style: TextStyle(
+                          color:      AppColors.primary,
+                          fontWeight: FontWeight.w800,
+                          fontSize:   13,
+                        ),
+                      ),
+                      Text(
+                        list[i].nama,
+                        style: const TextStyle(
+                          color:    Colors.white,
+                          fontSize: 14,
+                          fontWeight: FontWeight.w600,
+                        ),
+                      ),
+                      Text(
+                        '+${list[i].xpBonus} XP',
+                        style: const TextStyle(
+                          color:    Colors.white54,
+                          fontSize: 12,
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+              ],
+            ),
+          ),
+        );
+      });
+    }
+  }
+
+  int get _bintang {
+    final total = widget.benar + widget.salah;
+    if (total == 0) return 3;
+    final persen = widget.benar / total;
+    if (persen >= 0.9) return 5;
+    if (persen >= 0.7) return 4;
+    if (persen >= 0.5) return 3;
+    if (persen >= 0.3) return 2;
+    return 1;
+  }
+
+  String get _pesan {
+    switch (_bintang) {
+      case 5:  return 'Luar biasa! 🎉';
+      case 4:  return 'Kerja bagus! 👏';
+      case 3:  return 'Cukup baik! 💪';
+      case 2:  return 'Terus berlatih! 📚';
+      default: return 'Jangan menyerah! 🔥';
+    }
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      backgroundColor: AppColors.background,
+      body: SafeArea(
+        child: Column(
+          children: [
+            const Spacer(flex: 2),
+            SizedBox(
+              width:  120,
+              height: 120,
+              child:  CustomPaint(painter: _SimpleMascotPainter()),
+            ),
+            const SizedBox(height: 20),
+            const Text(
+              'Latihan selesai!',
+              style: TextStyle(
+                color:      Colors.white,
+                fontSize:   22,
+                fontWeight: FontWeight.w900,
+              ),
+            ),
+            const SizedBox(height: 6),
+            Text(
+              _pesan,
+              style: TextStyle(
+                color:    Colors.white.withValues(alpha: 0.7),
+                fontSize: 16,
+              ),
+            ),
+            const SizedBox(height: 16),
+            // XP didapat
+            if (!_loading && _hasil != null)
+              AnimatedOpacity(
+                opacity:  1.0,
+                duration: const Duration(milliseconds: 500),
+                child: Container(
+                  padding: const EdgeInsets.symmetric(
+                      horizontal: 20, vertical: 8),
+                  decoration: BoxDecoration(
+                    color:        AppColors.primary.withValues(alpha: 0.15),
+                    borderRadius: BorderRadius.circular(20),
+                    border: Border.all(
+                        color: AppColors.primary.withValues(alpha: 0.4)),
+                  ),
+                  child: Text(
+                    '+${_hasil!.xpDidapat} XP',
+                    style: const TextStyle(
+                      color:      AppColors.primary,
+                      fontWeight: FontWeight.w800,
+                      fontSize:   18,
+                    ),
+                  ),
+                ),
+              ),
+            const SizedBox(height: 16),
+            // Bintang
+            Row(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: List.generate(5, (i) => Padding(
+                padding: const EdgeInsets.symmetric(horizontal: 4),
+                child: Icon(
+                  i < _bintang ? Icons.star : Icons.star_border,
+                  color: const Color(0xFFFFD700),
+                  size:  36,
+                ),
+              )),
+            ),
+            const SizedBox(height: 28),
+            // Statistik
+            Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 24),
+              child: Row(
+                children: [
+                  Expanded(child: _StatCard(
+                    label:     'Benar',
+                    value:     '${widget.benar}',
+                    icon:      Icons.check_circle,
+                    iconColor: const Color(0xFF4CAF50),
+                    bgColor:   const Color(0xFFCDFF90),
+                  )),
+                  const SizedBox(width: 10),
+                  Expanded(child: _StatCard(
+                    label:     'Salah',
+                    value:     '${widget.salah}',
+                    icon:      Icons.cancel,
+                    iconColor: const Color(0xFFE53935),
+                    bgColor:   const Color(0xFFFF8A65),
+                  )),
+                  const SizedBox(width: 10),
+                  Expanded(child: _StatCard(
+                    label:     'Waktu',
+                    value:     widget.waktu,
+                    icon:      Icons.timer,
+                    iconColor: const Color(0xFF2196F3),
+                    bgColor:   const Color(0xFFFFE082),
+                  )),
+                ],
+              ),
+            ),
+            const Spacer(flex: 2),
+            // Tombol aksi
+            Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 24),
+              child: Column(
+                children: [
+                  SizedBox(
+                    width:  double.infinity,
+                    height: 52,
+                    child: ElevatedButton(
+                      onPressed: () {
+                        Navigator.of(context).pushReplacement(
+                          MaterialPageRoute(
+                            builder: (_) => LatihanScreen(
+                              bahasaKey: widget.bahasaKey,
+                              materiKey: widget.materiKey,
+                            ),
+                          ),
+                        );
+                      },
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: AppColors.primary,
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(14),
+                        ),
+                        elevation: 0,
+                      ),
+                      child: const Text(
+                        'Coba Lagi',
+                        style: TextStyle(
+                          color:      Colors.white,
+                          fontSize:   17,
+                          fontWeight: FontWeight.bold,
+                        ),
+                      ),
+                    ),
+                  ),
+                  const SizedBox(height: 10),
+                  SizedBox(
+                    width:  double.infinity,
+                    height: 52,
+                    child: OutlinedButton(
+                      onPressed: () {
+                        Navigator.of(context).pushAndRemoveUntil(
+                          MaterialPageRoute(
+                              builder: (_) => const HomeScreen()),
+                          (route) => false,
+                        );
+                      },
+                      style: OutlinedButton.styleFrom(
+                        side: BorderSide(
+                          color: Colors.white.withValues(alpha: 0.3),
+                          width: 1.5,
+                        ),
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(14),
+                        ),
+                      ),
+                      child: const Text(
+                        'Selesai',
+                        style: TextStyle(
+                          color:      Colors.white70,
+                          fontSize:   17,
+                          fontWeight: FontWeight.bold,
+                        ),
+                      ),
+                    ),
+                  ),
+                ],
+              ),
+            ),
+            const SizedBox(height: 20)
           ],
         ),
       ),
@@ -369,7 +712,9 @@ class _PilihPasanganWidgetState extends State<_PilihPasanganWidget> {
   void _periksa() {
     if (_periksaDone) return;
     final total = widget.soal.opsiKiri.length;
-    final cocok = _stateKiri.values.where((s) => s == _ItemState.benar).length;
+    final cocok = _stateKiri.values
+        .where((s) => s == _ItemState.benar)
+        .length;
     setState(() => _periksaDone = true);
     widget.onJawaban(cocok == total);
   }
@@ -389,21 +734,21 @@ class _PilihPasanganWidgetState extends State<_PilihPasanganWidget> {
           const Text(
             'Pilih pasangan yang cocok',
             style: TextStyle(
-              color: Colors.white,
-              fontSize: 22,
+              color:      Colors.white,
+              fontSize:   22,
               fontWeight: FontWeight.w900,
             ),
           ),
           const SizedBox(height: 8),
           Text(
             'Cocokkan kata Indonesia dengan bahasa Sunda-nya',
-            style: TextStyle(color: Colors.white.withOpacity(0.55), fontSize: 14),
+            style: TextStyle(
+                color: Colors.white.withValues(alpha: 0.55), fontSize: 14),
           ),
           const SizedBox(height: 24),
           Expanded(
             child: Row(
               children: [
-                // Kolom kiri (Indonesia)
                 Expanded(
                   child: Column(
                     children: widget.soal.opsiKiri.map((kata) {
@@ -414,7 +759,7 @@ class _PilihPasanganWidgetState extends State<_PilihPasanganWidget> {
                         child: Padding(
                           padding: const EdgeInsets.symmetric(vertical: 5),
                           child: _WordButton(
-                            text: kata,
+                            text:  kata,
                             state: state,
                             onTap: () => _pilihKiri(kata),
                           ),
@@ -424,7 +769,6 @@ class _PilihPasanganWidgetState extends State<_PilihPasanganWidget> {
                   ),
                 ),
                 const SizedBox(width: 12),
-                // Kolom kanan (Sunda)
                 Expanded(
                   child: Column(
                     children: widget.soal.opsiKanan.map((kata) {
@@ -435,7 +779,7 @@ class _PilihPasanganWidgetState extends State<_PilihPasanganWidget> {
                         child: Padding(
                           padding: const EdgeInsets.symmetric(vertical: 5),
                           child: _WordButton(
-                            text: kata,
+                            text:  kata,
                             state: state,
                             onTap: () => _pilihKanan(kata),
                           ),
@@ -449,12 +793,12 @@ class _PilihPasanganWidgetState extends State<_PilihPasanganWidget> {
           ),
           const SizedBox(height: 16),
           SizedBox(
-            width: double.infinity,
+            width:  double.infinity,
             height: 56,
             child: ElevatedButton(
               onPressed: _semuaCocok ? _periksa : null,
               style: ElevatedButton.styleFrom(
-                backgroundColor: AppColors.primary,
+                backgroundColor:         AppColors.primary,
                 disabledBackgroundColor: const Color(0xFF3D4560),
                 shape: RoundedRectangleBorder(
                   borderRadius: BorderRadius.circular(14),
@@ -464,8 +808,8 @@ class _PilihPasanganWidgetState extends State<_PilihPasanganWidget> {
               child: const Text(
                 'Periksa',
                 style: TextStyle(
-                  color: Colors.white,
-                  fontSize: 18,
+                  color:      Colors.white,
+                  fontSize:   18,
                   fontWeight: FontWeight.bold,
                 ),
               ),
@@ -483,7 +827,7 @@ class _PilihPasanganWidgetState extends State<_PilihPasanganWidget> {
 enum _ItemState { normal, dipilih, benar, salah }
 
 class _WordButton extends StatelessWidget {
-  final String text;
+  final String     text;
   final _ItemState state;
   final VoidCallback onTap;
   const _WordButton({
@@ -524,18 +868,18 @@ class _WordButton extends StatelessWidget {
       onTap: state == _ItemState.benar ? null : onTap,
       child: AnimatedContainer(
         duration: const Duration(milliseconds: 200),
-        width: double.infinity,
+        width:    double.infinity,
         decoration: BoxDecoration(
-          color: _bgColor,
+          color:        _bgColor,
           borderRadius: BorderRadius.circular(12),
-          border: Border.all(color: _borderColor, width: 2),
+          border:       Border.all(color: _borderColor, width: 2),
         ),
         child: Center(
           child: Text(
             text,
             style: TextStyle(
-              color: _textColor,
-              fontSize: 14,
+              color:      _textColor,
+              fontSize:   14,
               fontWeight: FontWeight.w600,
             ),
             textAlign: TextAlign.center,
@@ -586,40 +930,39 @@ class _PilihGambarWidgetState extends State<_PilihGambarWidget> {
           const Text(
             'Pilih gambar yang benar',
             style: TextStyle(
-              color: Colors.white,
-              fontSize: 22,
+              color:      Colors.white,
+              fontSize:   22,
               fontWeight: FontWeight.w900,
             ),
           ),
           const SizedBox(height: 8),
           Text(
             'Gambar mana yang sesuai dengan kata di bawah?',
-            style: TextStyle(color: Colors.white.withOpacity(0.55), fontSize: 14),
+            style: TextStyle(
+                color: Colors.white.withValues(alpha: 0.55), fontSize: 14),
           ),
           const SizedBox(height: 20),
-          // Chip kata kunci
           Container(
             padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
             decoration: BoxDecoration(
-              color: AppColors.surface,
+              color:        AppColors.surface,
               borderRadius: BorderRadius.circular(12),
               border: Border.all(color: AppColors.inputBorder, width: 1.5),
             ),
             child: Text(
               widget.soal.kataKunci ?? '',
               style: const TextStyle(
-                color: Colors.white,
-                fontSize: 20,
-                fontWeight: FontWeight.w700,
+                color:       Colors.white,
+                fontSize:    20,
+                fontWeight:  FontWeight.w700,
                 letterSpacing: 0.5,
               ),
             ),
           ),
           const SizedBox(height: 24),
-          // Grid 2×2
           Expanded(
             child: GridView.count(
-              crossAxisCount: 2,
+              crossAxisCount:  2,
               mainAxisSpacing: 12,
               crossAxisSpacing: 12,
               physics: const NeverScrollableScrollPhysics(),
@@ -630,8 +973,12 @@ class _PilihGambarWidgetState extends State<_PilihGambarWidget> {
                 Color borderColor = AppColors.inputBorder;
                 Color bgColor     = AppColors.surface;
                 if (_sudahJawab && isDipilih) {
-                  borderColor = isBenar ? const Color(0xFF4CAF50) : const Color(0xFFE53935);
-                  bgColor     = isBenar ? const Color(0xFF1B3A1F) : const Color(0xFF3A1B1B);
+                  borderColor = isBenar
+                      ? const Color(0xFF4CAF50)
+                      : const Color(0xFFE53935);
+                  bgColor = isBenar
+                      ? const Color(0xFF1B3A1F)
+                      : const Color(0xFF3A1B1B);
                 }
 
                 return GestureDetector(
@@ -639,9 +986,9 @@ class _PilihGambarWidgetState extends State<_PilihGambarWidget> {
                   child: AnimatedContainer(
                     duration: const Duration(milliseconds: 200),
                     decoration: BoxDecoration(
-                      color: bgColor,
+                      color:        bgColor,
                       borderRadius: BorderRadius.circular(16),
-                      border: Border.all(color: borderColor, width: 2),
+                      border:       Border.all(color: borderColor, width: 2),
                     ),
                     child: Stack(
                       alignment: Alignment.center,
@@ -654,7 +1001,7 @@ class _PilihGambarWidgetState extends State<_PilihGambarWidget> {
                           Positioned(
                             bottom: 10,
                             child: Container(
-                              width: 28,
+                              width:  28,
                               height: 28,
                               decoration: BoxDecoration(
                                 color: isBenar
@@ -665,7 +1012,7 @@ class _PilihGambarWidgetState extends State<_PilihGambarWidget> {
                               child: Icon(
                                 isBenar ? Icons.check : Icons.close,
                                 color: Colors.white,
-                                size: 18,
+                                size:  18,
                               ),
                             ),
                           ),
@@ -683,8 +1030,158 @@ class _PilihGambarWidgetState extends State<_PilihGambarWidget> {
   }
 }
 
+
+class _PilihAksaraWidget extends StatefulWidget {
+  final Soal soal;
+  final void Function(bool) onJawaban;
+  const _PilihAksaraWidget({required this.soal, required this.onJawaban});
+
+  @override
+  State<_PilihAksaraWidget> createState() => _PilihAksaraWidgetState();
+}
+
+class _PilihAksaraWidgetState extends State<_PilihAksaraWidget> {
+  int?  _dipilih;
+  bool  _sudahJawab = false;
+
+  void _pilih(int index) {
+    if (_sudahJawab) return;
+    final benar = index == widget.soal.aksaraIndexBenar;
+    setState(() { _dipilih = index; _sudahJawab = true; });
+    Future.delayed(const Duration(milliseconds: 900), () {
+      widget.onJawaban(benar);
+    });
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Padding(
+      padding: const EdgeInsets.symmetric(horizontal: 20),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          const SizedBox(height: 16),
+          const Text(
+            'Pilih aksara yang benar',
+            style: TextStyle(color: Colors.white, fontSize: 22, fontWeight: FontWeight.w900),
+          ),
+          const SizedBox(height: 8),
+          Text(
+            'Pilih aksara Sunda yang sesuai dengan suku kata berikut',
+            style: TextStyle(color: Colors.white.withValues(alpha: 0.55), fontSize: 14),
+          ),
+          const SizedBox(height: 24),
+
+          // Latin question prompt
+          Center(
+            child: Container(
+              padding: const EdgeInsets.symmetric(horizontal: 40, vertical: 18),
+              decoration: BoxDecoration(
+                gradient: LinearGradient(
+                  colors: [
+                    AppColors.primary.withValues(alpha: 0.25),
+                    AppColors.primary.withValues(alpha: 0.10),
+                  ],
+                ),
+                borderRadius: BorderRadius.circular(18),
+                border: Border.all(color: AppColors.primary.withValues(alpha: 0.6), width: 2),
+              ),
+              child: Text(
+                widget.soal.latinSoal ?? '',
+                style: const TextStyle(
+                  color: Colors.white,
+                  fontSize: 36,
+                  fontWeight: FontWeight.w900,
+                  letterSpacing: 2,
+                ),
+              ),
+            ),
+          ),
+          const SizedBox(height: 28),
+
+          // 2×2 grid of Aksara Sunda options
+          Expanded(
+            child: GridView.count(
+              crossAxisCount: 2,
+              mainAxisSpacing: 14,
+              crossAxisSpacing: 14,
+              physics: const NeverScrollableScrollPhysics(),
+              children: List.generate(widget.soal.aksaraOpsi.length, (i) {
+                final isBenar   = i == widget.soal.aksaraIndexBenar;
+                final isDipilih = _dipilih == i;
+
+                Color borderColor = AppColors.inputBorder;
+                Color bgColor     = AppColors.surface;
+                Color textColor   = Colors.white;
+
+                if (_sudahJawab && isDipilih) {
+                  borderColor = isBenar ? const Color(0xFF4CAF50) : const Color(0xFFE53935);
+                  bgColor     = isBenar ? const Color(0xFF1B3A1F) : const Color(0xFF3A1B1B);
+                  textColor   = isBenar ? const Color(0xFF4CAF50) : const Color(0xFFE53935);
+                } else if (_sudahJawab && isBenar) {
+                  // reveal correct answer if user picked wrong
+                  borderColor = const Color(0xFF4CAF50);
+                  bgColor     = const Color(0xFF1B3A1F);
+                  textColor   = const Color(0xFF4CAF50);
+                }
+
+                return GestureDetector(
+                  onTap: () => _pilih(i),
+                  child: AnimatedContainer(
+                    duration: const Duration(milliseconds: 200),
+                    decoration: BoxDecoration(
+                      color: bgColor,
+                      borderRadius: BorderRadius.circular(18),
+                      border: Border.all(color: borderColor, width: 2.5),
+                      boxShadow: [
+                        if (!_sudahJawab)
+                          BoxShadow(
+                            color: Colors.black.withValues(alpha: 0.3),
+                            blurRadius: 6,
+                            offset: const Offset(0, 3),
+                          ),
+                      ],
+                    ),
+                    child: Stack(
+                      alignment: Alignment.center,
+                      children: [
+                        Text(
+                          widget.soal.aksaraOpsi[i],
+                          style: TextStyle(
+                            fontFamily: 'aksara_sunda',  // font from pubspec.yaml
+                            color: textColor,
+                            fontSize: 52,
+                            height: 1.2,
+                          ),
+                        ),
+                        if (_sudahJawab && isDipilih)
+                          Positioned(
+                            bottom: 10,
+                            right: 10,
+                            child: Container(
+                              width: 26, height: 26,
+                              decoration: BoxDecoration(
+                                color: isBenar ? const Color(0xFF4CAF50) : const Color(0xFFE53935),
+                                shape: BoxShape.circle,
+                              ),
+                              child: Icon(isBenar ? Icons.check : Icons.close, color: Colors.white, size: 16),
+                            ),
+                          ),
+                      ],
+                    ),
+                  ),
+                );
+              }),
+            ),
+          ),
+          const SizedBox(height: 20),
+        ],
+      ),
+    );
+  }
+}
 // ════════════════════════════════════════════════════════════════
-//  HASIL SCREEN
+//  HELPER WIDGETS
 // ════════════════════════════════════════════════════════════════
 
 class HasilScreen extends StatelessWidget {
@@ -746,7 +1243,7 @@ class HasilScreen extends StatelessWidget {
             Text(
               _pesan,
               style: TextStyle(
-                color: Colors.white.withOpacity(0.7),
+                color: Colors.white.withValues(alpha: 0.7),
                 fontSize: 16,
               ),
             ),
@@ -809,7 +1306,7 @@ class HasilScreen extends StatelessWidget {
                         // Ulangi latihan dengan soal baru
                         Navigator.of(context).pushReplacement(
                           MaterialPageRoute(
-                            builder: (_) => LatihanScreen(
+                            builder: (_) => const LatihanScreen(
                               bahasaKey: 'sunda',
                             ),
                           ),
@@ -837,11 +1334,15 @@ class HasilScreen extends StatelessWidget {
                     width: double.infinity,
                     height: 52,
                     child: OutlinedButton(
-                      onPressed: () =>
-                          Navigator.of(context).popUntil((r) => r.isFirst),
+                      onPressed: () {
+                                      Navigator.of(context).pushAndRemoveUntil(
+                                        MaterialPageRoute(builder: (_) => const HomeScreen()),
+                                        (route) => false,
+                                      );
+                                    },
                       style: OutlinedButton.styleFrom(
                         side: BorderSide(
-                          color: Colors.white.withOpacity(0.3),
+                          color: Colors.white.withValues(alpha: 0.3),
                           width: 1.5,
                         ),
                         shape: RoundedRectangleBorder(
@@ -873,11 +1374,11 @@ class HasilScreen extends StatelessWidget {
 // ─── Kartu statistik ─────────────────────────────────────────
 
 class _StatCard extends StatelessWidget {
-  final String label;
-  final String value;
+  final String   label;
+  final String   value;
   final IconData icon;
-  final Color iconColor;
-  final Color bgColor;
+  final Color    iconColor;
+  final Color    bgColor;
   const _StatCard({
     required this.label,
     required this.value,
@@ -890,7 +1391,7 @@ class _StatCard extends StatelessWidget {
   Widget build(BuildContext context) {
     return Container(
       decoration: BoxDecoration(
-        color: bgColor,
+        color:        bgColor,
         borderRadius: BorderRadius.circular(12),
       ),
       padding: const EdgeInsets.symmetric(vertical: 10, horizontal: 8),
@@ -898,14 +1399,14 @@ class _StatCard extends StatelessWidget {
         children: [
           Text(label,
               style: const TextStyle(
-                color: Colors.black87,
+                color:      Colors.black87,
                 fontWeight: FontWeight.bold,
-                fontSize: 13,
+                fontSize:   13,
               )),
           const SizedBox(height: 6),
           Container(
             decoration: BoxDecoration(
-              color: Colors.white,
+              color:        Colors.white,
               borderRadius: BorderRadius.circular(8),
             ),
             padding: const EdgeInsets.symmetric(vertical: 8, horizontal: 4),
@@ -916,9 +1417,9 @@ class _StatCard extends StatelessWidget {
                 const SizedBox(width: 4),
                 Text(value,
                     style: const TextStyle(
-                      color: Colors.black87,
+                      color:      Colors.black87,
                       fontWeight: FontWeight.w900,
-                      fontSize: 16,
+                      fontSize:   16,
                     )),
               ],
             ),
@@ -929,46 +1430,44 @@ class _StatCard extends StatelessWidget {
   }
 }
 
-// ─── Bottom nav placeholder ───────────────────────────────────
-
 class _BottomNavSimple extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Container(
       height: 64,
-      decoration: BoxDecoration(
+      decoration: const BoxDecoration(
         color: AppColors.background,
         border: Border(top: BorderSide(color: AppColors.divider, width: 0.5)),
       ),
-      child: Row(
+      child: const Row(
         mainAxisAlignment: MainAxisAlignment.spaceAround,
-        children: const [
-          Icon(Icons.home,              color: Color(0xFFE05252), size: 28),
-          Icon(Icons.emoji_events,      color: Color(0xFFD4A017), size: 28),
-          Icon(Icons.play_circle_fill,  color: Color(0xFF8B2BE2), size: 28),
-          Icon(Icons.calculate,         color: Color(0xFF4CAF50), size: 28),
-          Icon(Icons.person,            color: Colors.white54,    size: 28),
+        children: [
+          Icon(Icons.home,             color: Color(0xFFE05252), size: 28),
+          Icon(Icons.emoji_events,     color: Color(0xFFD4A017), size: 28),
+          Icon(Icons.play_circle_fill, color: Color(0xFF8B2BE2), size: 28),
+          Icon(Icons.abc_rounded,      color: Color(0xFF4CAF50), size: 28),
+          Icon(Icons.person,           color: Colors.white54,    size: 28),
         ],
       ),
     );
   }
 }
 
-// ─── Maskot ───────────────────────────────────────────────────
-
 class _SimpleMascotPainter extends CustomPainter {
   @override
   void paint(Canvas canvas, Size size) {
-    final cx = size.width / 2;
-    final cy = size.height / 2;
+    final cx   = size.width / 2;
+    final cy   = size.height / 2;
     final body = Paint()..color = const Color(0xFFE07B3A);
     canvas.drawCircle(Offset(cx, cy - 10), 38, body);
     canvas.drawOval(
-        Rect.fromCenter(center: Offset(cx, cy + 25), width: 65, height: 55),
+        Rect.fromCenter(
+            center: Offset(cx, cy + 25), width: 65, height: 55),
         body);
     final belly = Paint()..color = const Color(0xFFF5DEB3);
     canvas.drawOval(
-        Rect.fromCenter(center: Offset(cx, cy - 8), width: 42, height: 34),
+        Rect.fromCenter(
+            center: Offset(cx, cy - 8), width: 42, height: 34),
         belly);
     final eye = Paint()..color = const Color(0xFF3D1A00);
     canvas.drawCircle(Offset(cx - 10, cy - 16), 5, eye);
@@ -978,9 +1477,10 @@ class _SimpleMascotPainter extends CustomPainter {
     canvas.drawCircle(Offset(cx + 12.5, cy - 18.5), 1.8, shine);
     final nose = Paint()..color = const Color(0xFF5C2A00);
     canvas.drawOval(
-        Rect.fromCenter(center: Offset(cx, cy - 7), width: 9, height: 6),
+        Rect.fromCenter(
+            center: Offset(cx, cy - 7), width: 9, height: 6),
         nose);
-    final cape = Paint()..color = const Color(0xFFC0392B);
+    final cape     = Paint()..color = const Color(0xFFC0392B);
     final capePath = Path()
       ..moveTo(cx - 32, cy + 8)
       ..quadraticBezierTo(cx, cy + 60, cx + 32, cy + 8)
@@ -994,7 +1494,7 @@ class _SimpleMascotPainter extends CustomPainter {
     canvas.drawPath(
         tailPath,
         body
-          ..style     = PaintingStyle.stroke
+          ..style       = PaintingStyle.stroke
           ..strokeWidth = 12
           ..strokeCap   = StrokeCap.round);
   }

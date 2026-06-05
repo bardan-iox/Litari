@@ -4,17 +4,18 @@ import '../theme/app_theme.dart';
 import '../widgets/litari_logo.dart';
 import '../services/user_service.dart';
 import 'home_screen.dart';
-import 'register_screen.dart';
+import 'login_screen.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 
-class LoginScreen extends StatefulWidget {
-  const LoginScreen({super.key});
+class RegisterScreen extends StatefulWidget {
+  const RegisterScreen({super.key});
 
   @override
-  State<LoginScreen> createState() => _LoginScreenState();
+  State<RegisterScreen> createState() => _RegisterScreenState();
 }
 
-class _LoginScreenState extends State<LoginScreen> {
+class _RegisterScreenState extends State<RegisterScreen> {
+  final TextEditingController _usernameController = TextEditingController();
   final TextEditingController _emailController = TextEditingController();
   final TextEditingController _passwordController = TextEditingController();
   bool _obscurePassword = true;
@@ -23,14 +24,21 @@ class _LoginScreenState extends State<LoginScreen> {
 
   @override
   void dispose() {
+    _usernameController.dispose();
     _emailController.dispose();
     _passwordController.dispose();
     super.dispose();
   }
 
-  Future<void> _onLanjut() async {
-    if (_emailController.text.isEmpty || _passwordController.text.isEmpty) {
-      setState(() => _errorMessage = 'Email dan kata sandi tidak boleh kosong');
+  Future<void> _onDaftar() async {
+    if (_usernameController.text.isEmpty ||
+        _emailController.text.isEmpty ||
+        _passwordController.text.isEmpty) {
+      setState(() => _errorMessage = 'Semua field harus diisi');
+      return;
+    }
+    if (_passwordController.text.length < 6) {
+      setState(() => _errorMessage = 'Kata sandi minimal 6 karakter');
       return;
     }
 
@@ -40,10 +48,12 @@ class _LoginScreenState extends State<LoginScreen> {
     });
 
     try {
-      final cred = await FirebaseAuth.instance.signInWithEmailAndPassword(
+      final cred =
+          await FirebaseAuth.instance.createUserWithEmailAndPassword(
         email: _emailController.text.trim(),
         password: _passwordController.text.trim(),
       );
+      await cred.user?.updateDisplayName(_usernameController.text.trim());
       await UserService.initUser(cred.user!);
       if (mounted) {
         Navigator.of(context).pushAndRemoveUntil(
@@ -54,26 +64,20 @@ class _LoginScreenState extends State<LoginScreen> {
     } on FirebaseAuthException catch (e) {
       setState(() {
         switch (e.code) {
-          case 'user-not-found':
-            _errorMessage = 'Akun tidak ditemukan';
-            break;
-          case 'wrong-password':
-            _errorMessage = 'Kata sandi salah';
+          case 'email-already-in-use':
+            _errorMessage = 'Email sudah terdaftar';
             break;
           case 'invalid-email':
             _errorMessage = 'Format email tidak valid';
             break;
-          case 'invalid-credential':
-            _errorMessage = 'Email atau kata sandi salah';
-            break;
-          case 'user-disabled':
-            _errorMessage = 'Akun ini telah dinonaktifkan';
+          case 'weak-password':
+            _errorMessage = 'Kata sandi terlalu lemah';
             break;
           case 'too-many-requests':
             _errorMessage = 'Terlalu banyak percobaan, coba lagi nanti';
             break;
           default:
-            _errorMessage = 'Login gagal, coba lagi';
+            _errorMessage = 'Registrasi gagal, coba lagi';
         }
       });
     } catch (e) {
@@ -83,7 +87,7 @@ class _LoginScreenState extends State<LoginScreen> {
     }
   }
 
-  Future<void> _onGoogleLogin() async {
+  Future<void> _onGoogleRegister() async {
     setState(() {
       _isLoading = true;
       _errorMessage = null;
@@ -104,7 +108,7 @@ class _LoginScreenState extends State<LoginScreen> {
         );
       }
     } catch (e) {
-      setState(() => _errorMessage = 'Login Google gagal: $e');
+      setState(() => _errorMessage = 'Daftar Google gagal: $e');
     } finally {
       if (mounted) setState(() => _isLoading = false);
     }
@@ -122,8 +126,9 @@ class _LoginScreenState extends State<LoginScreen> {
               children: [
                 const SizedBox(height: 32),
                 const LitariLogo(showName: true),
-                const SizedBox(height: 40),
-                _LoginCard(
+                const SizedBox(height: 32),
+                _RegisterCard(
+                  usernameController: _usernameController,
                   emailController: _emailController,
                   passwordController: _passwordController,
                   obscurePassword: _obscurePassword,
@@ -154,41 +159,33 @@ class _LoginScreenState extends State<LoginScreen> {
                 _isLoading
                     ? const CircularProgressIndicator(
                         color: AppColors.primary)
-                    : _LanjutButton(onPressed: _onLanjut),
+                    : _DaftarButton(onPressed: _onDaftar),
                 const SizedBox(height: 20),
-                GestureDetector(
-                  onTap: () {},
-                  child: const Text(
-                    'LUPA KATA SANDI',
-                    style: AppTextStyles.link,
-                  ),
-                ),
-                const SizedBox(height: 24),
                 Row(
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
                     const Text(
-                      'Belum punya akun? ',
+                      'Sudah punya akun? ',
                       style: AppTextStyles.bodySecondary,
                     ),
                     GestureDetector(
                       onTap: () {
                         Navigator.of(context).push(
                           MaterialPageRoute(
-                              builder: (_) => const RegisterScreen()),
+                              builder: (_) => const LoginScreen()),
                         );
                       },
-                      child: const Text('Daftar', style: AppTextStyles.link),
+                      child: const Text('Masuk', style: AppTextStyles.link),
                     ),
                   ],
                 ),
                 const SizedBox(height: 32),
-                _SocialLoginRow(onGooglePressed: _onGoogleLogin),
+                _SocialRegisterRow(onGooglePressed: _onGoogleRegister),
                 const SizedBox(height: 20),
                 const Padding(
                   padding: EdgeInsets.symmetric(horizontal: 8.0),
                   child: Text(
-                    'Dengan masuk ke Litari, kamu menyetujui Ketentuan dan Kebijakan Privasi kami.',
+                    'Dengan mendaftar ke Litari, kamu menyetujui Ketentuan dan Kebijakan Privasi kami.',
                     textAlign: TextAlign.center,
                     style: AppTextStyles.bodySecondary,
                   ),
@@ -203,13 +200,15 @@ class _LoginScreenState extends State<LoginScreen> {
   }
 }
 
-class _LoginCard extends StatelessWidget {
+class _RegisterCard extends StatelessWidget {
+  final TextEditingController usernameController;
   final TextEditingController emailController;
   final TextEditingController passwordController;
   final bool obscurePassword;
   final VoidCallback onTogglePassword;
 
-  const _LoginCard({
+  const _RegisterCard({
+    required this.usernameController,
     required this.emailController,
     required this.passwordController,
     required this.obscurePassword,
@@ -226,6 +225,21 @@ class _LoginCard extends StatelessWidget {
       ),
       child: Column(
         children: [
+          Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 16.0),
+            child: TextField(
+              controller: usernameController,
+              style: AppTextStyles.inputText,
+              decoration: const InputDecoration(
+                border: InputBorder.none,
+                hintText: 'Username',
+                hintStyle:
+                    TextStyle(color: AppColors.textHint, fontSize: 16),
+                contentPadding: EdgeInsets.symmetric(vertical: 18),
+              ),
+            ),
+          ),
+          const Divider(height: 1, thickness: 1, color: AppColors.inputBorder),
           Padding(
             padding: const EdgeInsets.symmetric(horizontal: 16.0),
             child: TextField(
@@ -273,9 +287,9 @@ class _LoginCard extends StatelessWidget {
   }
 }
 
-class _LanjutButton extends StatelessWidget {
+class _DaftarButton extends StatelessWidget {
   final VoidCallback onPressed;
-  const _LanjutButton({required this.onPressed});
+  const _DaftarButton({required this.onPressed});
 
   @override
   Widget build(BuildContext context) {
@@ -292,7 +306,7 @@ class _LanjutButton extends StatelessWidget {
           elevation: 0,
         ),
         child: const Text(
-          'Masuk',
+          'Daftar',
           style: TextStyle(
             color: Colors.white,
             fontSize: 17,
@@ -304,33 +318,36 @@ class _LanjutButton extends StatelessWidget {
   }
 }
 
-class _SocialLoginRow extends StatelessWidget {
+class _SocialRegisterRow extends StatelessWidget {
   final VoidCallback onGooglePressed;
-  const _SocialLoginRow({required this.onGooglePressed});
+  const _SocialRegisterRow({required this.onGooglePressed});
 
   @override
   Widget build(BuildContext context) {
-    return SizedBox(
-      width: double.infinity,
-      child: _SocialButton(
-        onPressed: onGooglePressed,
-        child: Row(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            SvgPicture.asset('assets/Google_logo.svg',
-                width: 28, height: 28),
-            const SizedBox(width: 8),
-            const Text(
-              'Google',
-              style: TextStyle(
-                color: AppColors.textPrimary,
-                fontSize: 18,
-                fontWeight: FontWeight.w500,
-              ),
+    return Row(
+      children: [
+        Expanded(
+          child: _SocialButton(
+            onPressed: onGooglePressed,
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                SvgPicture.asset('assets/Google_logo.svg',
+                    width: 28, height: 28),
+                const SizedBox(width: 8),
+                const Text(
+                  'Google',
+                  style: TextStyle(
+                    color: AppColors.textPrimary,
+                    fontSize: 18,
+                    fontWeight: FontWeight.w500,
+                  ),
+                ),
+              ],
             ),
-          ],
+          ),
         ),
-      ),
+      ],
     );
   }
 }

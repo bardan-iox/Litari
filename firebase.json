@@ -1,0 +1,1 @@
+{"flutter":{"platforms":{"android":{"default":{"projectId":"litari","appId":"1:875982109205:android:3a08a6a3be902dc4d72c1c","fileOutput":"android/app/google-services.json"}},"dart":{"lib/firebase_options.dart":{"projectId":"litari","configurations":{"android":"1:875982109205:android:3a08a6a3be902dc4d72c1c","web":"1:875982109205:web:ec0cdd927d90e396d72c1c"}}}}}}

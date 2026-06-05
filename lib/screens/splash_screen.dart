@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import '../theme/app_theme.dart';
 import '../widgets/litari_logo.dart';
 import 'login_screen.dart';
+import 'register_screen.dart';
 
 class SplashScreen extends StatelessWidget {
   const SplashScreen({super.key});
@@ -20,21 +21,31 @@ class SplashScreen extends StatelessWidget {
               const SizedBox(height: 20),
               const Text('LITARI', style: AppTextStyles.appName),
               const Spacer(flex: 3),
+
               _PrimaryButton(
                 label: 'Login',
                 onPressed: () {
-                  Navigator.of(context).push(
+                  Navigator.of(context).pushReplacement(
                     MaterialPageRoute(
-                      builder: (_) => const LoginScreen(), // ← fix: LoginScreen dulu
+                      builder: (_) => const LoginScreen(),
                     ),
                   );
                 },
               ),
+
               const SizedBox(height: 14),
+
               _SecondaryButton(
                 label: 'Register',
-                onPressed: () {},
+                onPressed: () {
+                  Navigator.of(context).pushReplacement(
+                    MaterialPageRoute(
+                      builder: (_) => const RegisterScreen(),
+                    ),
+                  );
+                },
               ),
+
               const SizedBox(height: 16),
             ],
           ),
@@ -47,7 +58,11 @@ class SplashScreen extends StatelessWidget {
 class _PrimaryButton extends StatelessWidget {
   final String label;
   final VoidCallback onPressed;
-  const _PrimaryButton({required this.label, required this.onPressed});
+
+  const _PrimaryButton({
+    required this.label,
+    required this.onPressed,
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -59,10 +74,15 @@ class _PrimaryButton extends StatelessWidget {
         style: ElevatedButton.styleFrom(
           backgroundColor: AppColors.primary,
           foregroundColor: AppColors.textPrimary,
-          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(14)),
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(14),
+          ),
           elevation: 0,
         ),
-        child: Text(label, style: AppTextStyles.buttonLabel),
+        child: Text(
+          label,
+          style: AppTextStyles.buttonLabel,
+        ),
       ),
     );
   }
@@ -71,7 +91,11 @@ class _PrimaryButton extends StatelessWidget {
 class _SecondaryButton extends StatelessWidget {
   final String label;
   final VoidCallback onPressed;
-  const _SecondaryButton({required this.label, required this.onPressed});
+
+  const _SecondaryButton({
+    required this.label,
+    required this.onPressed,
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -83,10 +107,15 @@ class _SecondaryButton extends StatelessWidget {
         style: ElevatedButton.styleFrom(
           backgroundColor: AppColors.surfaceVariant,
           foregroundColor: AppColors.textPrimary,
-          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(14)),
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(14),
+          ),
           elevation: 0,
         ),
-        child: Text(label, style: AppTextStyles.buttonLabel),
+        child: Text(
+          label,
+          style: AppTextStyles.buttonLabel,
+        ),
       ),
     );
   }
